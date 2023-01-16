@@ -1,0 +1,44 @@
+spring:
+  profiles:
+    group:
+      "local-dev": "local-dev"
+      "dev": "dev"
+      "prod": "prod"
+  main:
+    allow-circular-references: true
+  datasource:
+    driverClassName: com.mysql.jdbc.Driver
+    url: "jdbc:mysql://mysql.db.mdbgo.com/locprohp_web?autoreconnect=true"
+    username: "locprohp_locprohp"
+    password: "Thanhloc123456@"
+    testOnBorrow: true
+    testWhileIdle: true
+    timeBetweenEvictionRunsMillis: 60000
+    minEvictableIdleTimeMillis: 30000
+    validationQuery: SELECT 1
+    max-active: 15
+    max-idle: 10
+    max-wait: 15000
+
+server:
+  port: 8585
+  servlet:
+    context-path: /schedule-service
+  max-http-header-size: 10MB
+
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui
+    disable-swagger-default-url: true
+
+logging:
+  pattern:
+    console: "%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} [TUTOR-SERVICE] %m%n%wEx"
+
+schedule:
+  service:
+    swagger_url: http://localhost:8585/schedule-service/
+    local: true
