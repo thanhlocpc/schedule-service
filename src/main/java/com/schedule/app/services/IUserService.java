@@ -1,6 +1,7 @@
 package com.schedule.app.services;
 
 import com.schedule.app.entities.User;
+import com.schedule.app.security.UserPrincipal;
 
 import java.util.List;
 
@@ -18,4 +19,5 @@ public interface IUserService {
 
     List<User> findUsersByIdIn(List<Long> ids);
 
+    UserPrincipal getUserPrincipal(User userNet);
 }

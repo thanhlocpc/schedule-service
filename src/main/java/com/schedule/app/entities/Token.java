@@ -20,6 +20,8 @@ public class Token {
     @Column(length = 1000)
     private String token;
 
+
+
     private Date tokenExpDate;
 
 

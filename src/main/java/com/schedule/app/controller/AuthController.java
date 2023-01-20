@@ -4,13 +4,17 @@ import com.schedule.app.annotations.swagger.RequiredHeaderToken;
 import com.schedule.app.entities.*;
 import com.schedule.app.handler.TutorServiceException;
 import com.schedule.app.models.dtos.auths.LoginDTO;
+import com.schedule.app.models.requests.RefreshTokenRequest;
+import com.schedule.app.models.responses.JwtResponse;
 import com.schedule.app.models.wrapper.ObjectResponseWrapper;
 import com.schedule.app.security.UserPrincipal;
+import com.schedule.app.services.IRefreshTokenService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.experimental.ExtensionMethod;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -33,49 +37,54 @@ import java.util.*;
 @Transactional
 public class AuthController extends BaseAPI {
 
-
+    @Autowired
+    private IRefreshTokenService refreshTokenService;
 
 
     @PostMapping("/login")
     public ObjectResponseWrapper login(@Valid @RequestBody LoginDTO user) {
 //        UserLogin userNet = userLoginService.findByUserName(user.getEmail());
         User userNet = userService.findByEmail(user.getEmail());
-
-        if (userNet == null || userNet.getUserLogin() == null) {
-            throw new TutorServiceException("Không tìm thấy tài khoản");
-        }
-
-        UserLogin userLogin = userNet.getUserLogin();
-
-        if (!userLogin.getActive()) {
-            throw new TutorServiceException("Tài khoản chưa được kích hoạt");
-        }
-
-        UserPrincipal userPrincipal = new UserPrincipal();
-        if (null != userNet) {
-            userPrincipal.setUserId(userNet.getId());
-            userPrincipal.setUsername(userNet.getEmail());
-            userPrincipal.setPassword(userLogin.getPassword());
-
-            // lấy role
-            Set<String> authorities = new HashSet<>();
-            if (null != userNet.getRoles()) {
-                userNet.getRoles().forEach(r -> {
-                    authorities.add(r.getId());
-                    r.getPermissions().forEach(p -> authorities.add(p.getId()));
-                });
-            }
-            userPrincipal.setAuthorities(authorities);
-        }
+        System.out.println(userNet);
+        UserPrincipal userPrincipal = userService.getUserPrincipal(userNet);
         if (!new BCryptPasswordEncoder().matches(user.getPassword().trim(), userPrincipal.getPassword())) {
             throw new TutorServiceException("Sai mật khẩu");
         }
         Token token = new Token();
         token.setToken(jwtUtil.generateToken(userPrincipal));
         token.setTokenExpDate(jwtUtil.generateExpirationDate());
+        JwtResponse jwt = new JwtResponse();
+        jwt.setAccessToken(jwtUtil.generateToken(userPrincipal));
+        jwt.setTokenExpDate(jwtUtil.generateExpirationDate());
+        jwt.setRefreshToken(refreshTokenService.createRefreshToken(userNet.getEmail()).getRefreshToken());
         return ObjectResponseWrapper.builder()
                 .status(1)
-                .data(token.getToken())
+                .data(jwt)
+                .build();
+    }
+
+    @GetMapping("/refreshToken")
+    @Operation(summary = "Refresh token")
+    public ObjectResponseWrapper refreshToken(@Valid @RequestBody RefreshTokenRequest tokenRequest) {
+        RefreshToken refreshToken = refreshTokenService.findByToken(tokenRequest.getRefreshToken());
+        if (refreshToken == null) {
+            throw new TutorServiceException("Token không tồn tại.");
+        } else if (refreshToken.getExpiryDate().before(new Date())) {
+            throw new TutorServiceException("Token đã hết hạn.");
+        }
+
+        User userNet = refreshToken.getUser();
+        System.out.println(userNet);
+        UserPrincipal userPrincipal = userService.getUserPrincipal(userNet);
+        JwtResponse jwt = new JwtResponse();
+        jwt.setAccessToken(jwtUtil.generateToken(userPrincipal));
+        jwt.setTokenExpDate(jwtUtil.generateExpirationDate());
+
+            jwt.setRefreshToken(refreshToken.getRefreshToken());
+
+        return ObjectResponseWrapper.builder()
+                .status(1)
+                .data(jwt)
                 .build();
     }
 
@@ -100,7 +109,6 @@ public class AuthController extends BaseAPI {
                 .data(user)
                 .build();
     }
-
 
 
 }
