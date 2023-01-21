@@ -9,7 +9,11 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "subject")
 @Data
-public class Subject extends BaseEntity{
+public class Subject {
+
+    @Id
+    private String id;
+
     @Column(nullable = false)
     @NotNull
     private String name;

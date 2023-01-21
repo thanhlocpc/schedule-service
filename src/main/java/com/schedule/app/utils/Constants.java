@@ -14,6 +14,8 @@ public class Constants {
 
     public static final String AUTH_SERVICE_URL = API_VERSION + "/auths";
 
+    public static final String SUBJECT_SCHEDULE_SERVICE_URL = API_VERSION + "/subject-schedules";
+
     public static final String TUTOR_SERVICE_URL = API_VERSION + "/tutors";
 
     public static final String SUBJECT_SERVICE_URL = API_VERSION + "/subjects";

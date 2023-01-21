@@ -27,4 +27,8 @@ public class SubjectSchedule extends BaseEntity{
 
     @Column(nullable = false)
     private LocalDate dateExam;
+
+    private int subjectScheduleIndex;
+
+    private int candidateAmount;
 }

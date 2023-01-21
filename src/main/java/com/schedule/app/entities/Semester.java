@@ -8,7 +8,7 @@ import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "class")
+@Table(name = "semester")
 @Data
 @NotNull
 public class Semester extends  BaseEntity{
