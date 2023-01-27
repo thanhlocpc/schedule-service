@@ -1,9 +1,9 @@
 package com.schedule.app.controller;
 
 import com.google.gson.Gson;
-import com.schedule.app.services.IRefreshTokenService;
+import com.schedule.app.repository.ISubjectScheduleResultRepository;
+import com.schedule.app.services.ISubjectScheduleService;
 import com.schedule.app.services.IUserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.logging.Logger;
@@ -28,6 +28,15 @@ public abstract class BaseAPI {
 
 
 
+    //service
     @Autowired
     protected IUserService userService;
+
+    @Autowired
+    protected ISubjectScheduleService subjectScheduleService;
+
+
+    //repository
+    @Autowired
+    protected ISubjectScheduleResultRepository courseRegisterResultRepository;
 }

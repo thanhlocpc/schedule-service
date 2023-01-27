@@ -33,8 +33,8 @@ public class ErrorHandle extends ResponseEntityExceptionHandler {
 //        return ObjectResponseWrapper.builder().status(0).message(e.getMessage()).build();
 //    }
 
-    @ExceptionHandler(value = {TutorServiceException.class})
-    protected ObjectResponseWrapper handleResponseStatusException(TutorServiceException e) {
+    @ExceptionHandler(value = {ScheduleServiceException.class})
+    protected ObjectResponseWrapper handleResponseStatusException(ScheduleServiceException e) {
         return ObjectResponseWrapper.builder().status(0).message(e.getReason()).data(e.getData()).build();
     }
 

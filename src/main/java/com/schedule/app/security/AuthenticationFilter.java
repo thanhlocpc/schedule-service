@@ -47,8 +47,11 @@ public class AuthenticationFilter extends GenericFilterBean {
 
         System.out.println("[Request] " + httpRequest.getRemoteAddr() + " - " + httpRequest.getMethod() + " - " + httpRequest.getRequestURI());
 
+        if(httpRequest.getRequestURI().indexOf("login") > -1){
+            filterChain.doFilter(servletRequest, servletResponse);
+            return;
+        }
 //        Optional<String> token = Optional.ofNullable(httpRequest.getHeader(HTTP_REQUEST_HEADER_NAME));
-        Object d = httpRequest.getHeaderNames();
         final String authorizationHeader = httpRequest.getHeader(HTTP_REQUEST_HEADER_NAME);
         UserPrincipal user = null;
 //        Token token2 = null;

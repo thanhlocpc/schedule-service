@@ -1,6 +1,7 @@
 package com.schedule.app.entities;
 
-import com.schedule.app.models.enums.ExamType;
+//import com.schedule.app.models.enums.ExamType;
+import com.schedule.app.models.enums.EnumsConst;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -21,7 +22,10 @@ public class Subject {
     @Column(nullable = false)
     @NotNull
     @Enumerated(EnumType.STRING)
-    private ExamType examType;
+    private EnumsConst.ExamType examType;
+
+    @Column(name = "exam_time")
+    private int examTime;
 
     private int credit;
 }

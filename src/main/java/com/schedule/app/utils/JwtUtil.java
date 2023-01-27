@@ -10,6 +10,7 @@ import com.schedule.app.security.UserPrincipal;
 import net.minidev.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.text.ParseException;
@@ -44,7 +45,7 @@ public class JwtUtil {
     }
 
     public Date generateExpirationDate() {
-        return new Date(System.currentTimeMillis() + 60000);
+        return new Date(System.currentTimeMillis() + 60000*1000);
     }
     public JWTClaimsSet getClaimsFromToken(String token) {
         JWTClaimsSet claims = null;

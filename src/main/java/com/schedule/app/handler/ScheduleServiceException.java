@@ -8,16 +8,16 @@ import org.springframework.web.server.ResponseStatusException;
  * @author : Thành Lộc
  * @since : 10/5/2022, Wed
  **/
-public class TutorServiceException extends ResponseStatusException {
+public class ScheduleServiceException extends ResponseStatusException {
 
     @Getter
     private Object data;
 
-    public TutorServiceException(String message) {
+    public ScheduleServiceException(String message) {
         super(HttpStatus.NOT_FOUND, message);
     }
 
-    public TutorServiceException(String message, Object data) {
+    public ScheduleServiceException(String message, Object data) {
         super(HttpStatus.NOT_FOUND, message);
         this.data = data;
     }

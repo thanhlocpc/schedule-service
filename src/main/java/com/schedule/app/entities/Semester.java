@@ -13,7 +13,7 @@ import javax.validation.constraints.NotNull;
 @NotNull
 public class Semester extends  BaseEntity{
     @Column(nullable = false)
-    private String semesterName;
+    private int semesterName;
 
     @Column(nullable = false)
     private int academyYear;

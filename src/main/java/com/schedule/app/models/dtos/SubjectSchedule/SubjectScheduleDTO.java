@@ -28,6 +28,12 @@ public class SubjectScheduleDTO {
 
     private int shift;
 
+    private int lessonStart;
+
+    private int lessonEnd;
+
+    private String examType;
+
     private LocalDate dateExam;
 
     private int subjectScheduleIndex;

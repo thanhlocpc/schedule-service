@@ -54,6 +54,8 @@ public abstract class ABaseServices {
     @Autowired
     protected IUserRoleRepository userRoleRepository;
 
+    @Autowired
+    protected ISubjectScheduleResultRepository subjectScheduleResultRepository;
 
 
 

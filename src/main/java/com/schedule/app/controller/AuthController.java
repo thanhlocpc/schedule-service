@@ -2,7 +2,7 @@ package com.schedule.app.controller;
 
 import com.schedule.app.annotations.swagger.RequiredHeaderToken;
 import com.schedule.app.entities.*;
-import com.schedule.app.handler.TutorServiceException;
+import com.schedule.app.handler.ScheduleServiceException;
 import com.schedule.app.models.dtos.auths.LoginDTO;
 import com.schedule.app.models.requests.RefreshTokenRequest;
 import com.schedule.app.models.responses.JwtResponse;
@@ -48,7 +48,7 @@ public class AuthController extends BaseAPI {
         System.out.println(userNet);
         UserPrincipal userPrincipal = userService.getUserPrincipal(userNet);
         if (!new BCryptPasswordEncoder().matches(user.getPassword().trim(), userPrincipal.getPassword())) {
-            throw new TutorServiceException("Sai mật khẩu");
+            throw new ScheduleServiceException("Sai mật khẩu");
         }
         Token token = new Token();
         token.setToken(jwtUtil.generateToken(userPrincipal));
@@ -68,9 +68,9 @@ public class AuthController extends BaseAPI {
     public ObjectResponseWrapper refreshToken(@Valid @RequestBody RefreshTokenRequest tokenRequest) {
         RefreshToken refreshToken = refreshTokenService.findByToken(tokenRequest.getRefreshToken());
         if (refreshToken == null) {
-            throw new TutorServiceException("Token không tồn tại.");
+            throw new ScheduleServiceException("Token không tồn tại.");
         } else if (refreshToken.getExpiryDate().before(new Date())) {
-            throw new TutorServiceException("Token đã hết hạn.");
+            throw new ScheduleServiceException("Token đã hết hạn.");
         }
 
         User userNet = refreshToken.getUser();
@@ -100,7 +100,7 @@ public class AuthController extends BaseAPI {
         User user = userService.findById(userPrincipal.getUserId());
 
         if (user == null) {
-            throw new TutorServiceException("Không tìm thấy user này.");
+            throw new ScheduleServiceException("Không tìm thấy user này.");
         }
         user.setUserLogin(null);
 

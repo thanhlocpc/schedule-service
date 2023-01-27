@@ -2,7 +2,7 @@ package com.schedule.app.services.impl;
 
 import com.schedule.app.entities.User;
 import com.schedule.app.entities.UserLogin;
-import com.schedule.app.handler.TutorServiceException;
+import com.schedule.app.handler.ScheduleServiceException;
 import com.schedule.app.security.UserPrincipal;
 import com.schedule.app.services.ABaseServices;
 import com.schedule.app.services.IUserService;
@@ -44,13 +44,13 @@ public class UserService extends ABaseServices implements IUserService {
     @Override
     public UserPrincipal getUserPrincipal(User userNet) {
         if (userNet == null || userNet.getUserLogin() == null) {
-            throw new TutorServiceException("Không tìm thấy tài khoản");
+            throw new ScheduleServiceException("Không tìm thấy tài khoản");
         }
 
         UserLogin userLogin = userNet.getUserLogin();
 
         if (!userLogin.getActive()) {
-            throw new TutorServiceException("Tài khoản chưa được kích hoạt");
+            throw new ScheduleServiceException("Tài khoản chưa được kích hoạt");
         }
 
         UserPrincipal userPrincipal = new UserPrincipal();

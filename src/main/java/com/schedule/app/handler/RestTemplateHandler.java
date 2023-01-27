@@ -25,7 +25,7 @@ public class RestTemplateHandler implements ResponseErrorHandler {
     @Override
     public void handleError(ClientHttpResponse httpResponse) throws IOException {
         if (httpResponse.getStatusCode().series().equals(SERVER_ERROR)) {
-            throw new TutorServiceException("Đã xảy ra lỗi");
+            throw new ScheduleServiceException("Đã xảy ra lỗi");
         } else if (httpResponse.getStatusCode().series().equals(CLIENT_ERROR)) {
             if (httpResponse.getStatusCode().equals(HttpStatus.NOT_FOUND)) {
                 throw new NotFoundException("Không tồn tại");
