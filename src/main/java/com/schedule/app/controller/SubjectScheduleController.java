@@ -10,11 +10,9 @@ import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
 import lombok.experimental.ExtensionMethod;
 import org.modelmapper.ModelMapper;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.xml.ws.Response;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
