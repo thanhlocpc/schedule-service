@@ -50,4 +50,4 @@ jobs:
           app-name: 'thanhloc'
           slot-name: 'Production'
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_7645E86B12DD4067A20B52A2A96E8164 }}
-          package: '*.jar'
+          package: '*.war'
