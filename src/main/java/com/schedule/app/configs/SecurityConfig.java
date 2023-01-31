@@ -27,14 +27,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("https://tutor-services.herokuapp.com");
-        config.addAllowedOrigin("https://tutor-services.azurewebsites.net");
-        config.addAllowedOrigin("https://tutor-service.azurewebsites.net");
+        config.addAllowedOrigin("https://thanhloc.azurewebsites.net");
         config.addAllowedOrigin("http://localhost:8585");
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedOrigin("http://localhost:3031");
-        config.addAllowedOrigin("https://tutor-website-52add.web.app");
-        config.addAllowedOrigin("https://tutor-admin-nlu.web.app");
+        config.addAllowedOrigin("https://schedule-web-bbbd5.web.app");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
