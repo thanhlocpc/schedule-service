@@ -20,11 +20,11 @@ spring:
     max-idle: 10
     max-wait: 15000
 
-server:
-  port: 8585
-  servlet:
-    context-path: /schedule-service
-  max-http-header-size: 10MB
+#server:
+#  port: 8585
+#  servlet:
+#    context-path: /schedule-service
+#  max-http-header-size: 10MB
 
 
 springdoc:
