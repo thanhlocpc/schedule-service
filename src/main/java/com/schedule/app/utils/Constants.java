@@ -10,7 +10,7 @@ public class Constants {
 
     public static final String HEADER_TOKEN_NAME = "Access-Token";
 
-    public static final String API_VERSION = "v1";
+    public static final String API_VERSION = "schedule-service/v1";
 
     public static final String AUTH_SERVICE_URL = API_VERSION + "/auths";
 

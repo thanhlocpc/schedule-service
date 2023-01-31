@@ -40,5 +40,5 @@ logging:
 
 schedule:
   service:
-    swagger_url: http://localhost:8585/schedule-service/
+    swagger_url: https://thanhloc.azurewebsites.net/schedule-service/
     local: true
