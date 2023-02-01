@@ -20,5 +20,7 @@ public class SubjectScheduleResult extends BaseEntity{
 
     private Long studentId;
 
+    private Double mark;
+
     private Date createdAt;
 }
