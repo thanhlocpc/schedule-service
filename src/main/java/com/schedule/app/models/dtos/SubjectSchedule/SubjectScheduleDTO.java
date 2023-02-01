@@ -14,6 +14,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class SubjectScheduleDTO {
 
+    private String subjectId;
+
     private String subjectName;
 
     private String classroomName;

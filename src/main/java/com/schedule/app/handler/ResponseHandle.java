@@ -5,6 +5,7 @@ import com.schedule.app.models.wrapper.ObjectResponseWrapper;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.http.server.ServerHttpResponse;
@@ -29,6 +30,9 @@ public class ResponseHandle implements ResponseBodyAdvice<Object> {
     public Object beforeBodyWrite(Object data, @NonNull MethodParameter methodParameter, @NonNull MediaType mediaType,
                                   @NonNull Class<? extends HttpMessageConverter<?>> aClass, @NonNull ServerHttpRequest serverHttpRequest,
                                   @NonNull ServerHttpResponse serverHttpResponse) {
+        if (data instanceof ResponseEntity) return data;
+        if (data instanceof byte[]) return data;
+        if (data instanceof Byte) return data;
         if (data instanceof Resource) return data;
         if (data instanceof ObjectResponseWrapper) return data;
         if (data instanceof String && ((String) data).contains("openapi")) return data;

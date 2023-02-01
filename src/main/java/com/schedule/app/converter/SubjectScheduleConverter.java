@@ -11,6 +11,7 @@ public class SubjectScheduleConverter {
 
     public static SubjectScheduleDTO toSubjectScheduleDTO(SubjectSchedule subjectSchedule){
         SubjectScheduleDTO subjectScheduleDTO = new SubjectScheduleDTO();
+        subjectScheduleDTO.setSubjectId(subjectSchedule.getSubject().getId());
         subjectScheduleDTO.setExamType(subjectSchedule.getSubject().getExamType().getDescription());
         subjectScheduleDTO.setSubjectName(subjectSchedule.getSubject().getName());
         subjectScheduleDTO.setCourseName(subjectSchedule.getCourse().getName());
