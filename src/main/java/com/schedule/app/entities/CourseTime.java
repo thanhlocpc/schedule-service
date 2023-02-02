@@ -27,9 +27,7 @@ public class CourseTime extends BaseEntity{
 
     private int dayOfWeek;
 
-    private int hourStart;
-
-    private int minuteStart;
+    private int timeStart;
 
     private Date createdAt;
 }
