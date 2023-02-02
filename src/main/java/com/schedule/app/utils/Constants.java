@@ -16,15 +16,13 @@ public class Constants {
 
     public static final String SUBJECT_SCHEDULE_SERVICE_URL = API_VERSION + "/subject-schedules";
 
-    public static final String TUTOR_SERVICE_URL = API_VERSION + "/tutors";
+    public static final String COURSE_REGISTRATION_RESULT_SERVICE_URL = API_VERSION + "/course-registration-result";
 
     public static final String SUBJECT_SERVICE_URL = API_VERSION + "/subjects";
 
     public static final String GRADE_SERVICE_URL = API_VERSION + "/grades";
 
     public static final String CLASS_ROOM_SERVICE_URL = API_VERSION + "/class-room";
-
-    public static final String PAYMENT_SERVICE_URL = API_VERSION + "/payment";
 
     public static final String ADDRESS_SERVICE_URL = API_VERSION + "/address";
 
