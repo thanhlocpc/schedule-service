@@ -27,5 +27,8 @@ public class Subject {
     @Column(name = "exam_time")
     private int examTime;
 
+    @Column(name = "lesson_time")
+    private int lessonTime;
+
     private int credit;
 }

@@ -1,7 +1,6 @@
 package com.schedule.app.controller;
 
-import com.schedule.app.entities.Subject;
-import com.schedule.app.models.dtos.Subject.SubjectDTO;
+import com.schedule.app.models.dtos.subject.SubjectDTO;
 import com.schedule.app.services.ISubjectService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
