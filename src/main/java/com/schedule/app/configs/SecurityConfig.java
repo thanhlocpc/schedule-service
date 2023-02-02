@@ -32,6 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedOrigin("http://localhost:3031");
         config.addAllowedOrigin("https://schedule-web-bbbd5.web.app");
+        config.addAllowedOrigin("https://admin-schedule-web.web.app");
         config.addAllowedHeader("*");
         config.addAllowedMethod("*");
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
