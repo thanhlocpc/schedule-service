@@ -57,6 +57,9 @@ public abstract class ABaseServices {
     @Autowired
     protected ISubjectScheduleResultRepository subjectScheduleResultRepository;
 
+    @Autowired
+    protected ICourseRegistrationResultRepository courseRegistrationResultRepository;
+
 
 
     // service

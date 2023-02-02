@@ -4,6 +4,7 @@ import lombok.Data;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 
 @Entity
 @Table(name = "course")
@@ -30,4 +31,8 @@ public class Course extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "semester_id")
     private Semester semester;
+
+    @OneToMany
+    @JoinColumn(name = "course_id", referencedColumnName = "id")
+    private List<CourseTime> courseTimes;
 }
