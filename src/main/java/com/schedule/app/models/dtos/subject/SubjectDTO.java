@@ -1,4 +1,4 @@
-package com.schedule.app.models.dtos.Subject;
+package com.schedule.app.models.dtos.subject;
 
 import com.schedule.app.entities.Subject;
 import lombok.AllArgsConstructor;
@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @Builder

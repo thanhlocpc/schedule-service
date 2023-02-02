@@ -1,7 +1,6 @@
 package com.schedule.app.services.impl;
 
-import com.schedule.app.entities.Subject;
-import com.schedule.app.models.dtos.Subject.SubjectDTO;
+import com.schedule.app.models.dtos.subject.SubjectDTO;
 import com.schedule.app.repository.ISubjectRepository;
 import com.schedule.app.services.ISubjectService;
 import org.springframework.beans.factory.annotation.Autowired;

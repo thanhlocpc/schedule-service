@@ -1,7 +1,7 @@
 package com.schedule.app.converter;
 
 import com.schedule.app.entities.SubjectSchedule;
-import com.schedule.app.models.dtos.SubjectSchedule.SubjectScheduleDTO;
+import com.schedule.app.models.dtos.subject_schedule.SubjectScheduleDTO;
 
 /**
  * @author ThanhLoc
