@@ -2,6 +2,7 @@ package com.schedule.app.services;
 
 import com.schedule.app.entities.CourseRegistrationResult;
 import com.schedule.app.models.dtos.score.ScoreTableDTO;
+import org.apache.poi.ss.usermodel.Workbook;
 
 import java.util.List;
 
@@ -17,4 +18,6 @@ public interface ICourseRegistrationResultService {
     public List<CourseRegistrationResult> findCourseRegistrationResultByStudent(Long studentId);
 
     ScoreTableDTO getScoreTableByStudent(Long userId);
+
+    Workbook exportTimeTable(Long userId, int semester, int year);
 }
