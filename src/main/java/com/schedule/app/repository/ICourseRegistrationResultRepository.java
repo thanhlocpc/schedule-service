@@ -18,4 +18,7 @@ public interface ICourseRegistrationResultRepository extends JpaRepository<Cours
     public List<CourseRegistrationResult> findCourseRegistrationResultByStudentAndSemester(@Param("studentId") Long studentId,
                                                                                            @Param("year") int year,
                                                                                            @Param("semester") int semester);
+
+    @Query("select distinct c from CourseRegistrationResult c where c.user.id = :studentId")
+    public List<CourseRegistrationResult> findCourseRegistrationResultByStudent(@Param("studentId") Long studentId);
 }

@@ -17,4 +17,9 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
     public List<CourseRegistrationResult> getCourseRegistrationResultByStudentIdAndYearAndSemester(Long studentId, int year, int semester) {
         return courseRegistrationResultRepository.findCourseRegistrationResultByStudentAndSemester(studentId,year,semester);
     }
+
+    @Override
+    public List<CourseRegistrationResult> findCourseRegistrationResultByStudent(Long studentId) {
+        return courseRegistrationResultRepository.findCourseRegistrationResultByStudent(studentId);
+    }
 }

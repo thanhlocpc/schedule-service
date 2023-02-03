@@ -2,10 +2,7 @@ package com.schedule.app.entities;
 
 import lombok.Data;
 
-import javax.persistence.Entity;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Date;
 
 /**
@@ -24,6 +21,14 @@ public class CourseRegistrationResult extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "student_id", referencedColumnName = "id")
     private User user;
+
+    private double numberScoreFour;
+
+    private double numberScoreTen;
+
+    private String literalScore;
+
+    private boolean isPass;
 
     private Date createdAt;
 }
