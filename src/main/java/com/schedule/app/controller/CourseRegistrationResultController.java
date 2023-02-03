@@ -6,6 +6,7 @@ import com.schedule.app.entities.CourseRegistrationResult;
 import com.schedule.app.entities.Semester;
 import com.schedule.app.handler.ScheduleServiceException;
 import com.schedule.app.models.dtos.course_registration_result.CourseRegistrationResultDTO;
+import com.schedule.app.models.dtos.score.ScoreTableDTO;
 import com.schedule.app.models.dtos.score.SemesterTranscriptDTO;
 import com.schedule.app.models.dtos.score.SubjectScoreDTO;
 import com.schedule.app.security.UserPrincipal;
@@ -93,23 +94,29 @@ public class CourseRegistrationResultController extends BaseAPI {
                 }
             }
             List<SemesterTranscriptDTO> semesterTranscriptDTOS = new ArrayList<>();
+            ScoreTableDTO scoreTableDTO = new ScoreTableDTO();
+            scoreTableDTO.setSemesterTranscripts(semesterTranscriptDTOS);
+            double totalScore = 0;
+            double avgScore = 0;
+            int totalCredit = 0;
+            int totalCreditPass = 0;
             for (Map.Entry<Integer, List<CourseRegistrationResult>> en : map.entrySet()) {
                 List<CourseRegistrationResult> courses = en.getValue();
                 SemesterTranscriptDTO semesterTranscriptDTO = new SemesterTranscriptDTO();
                 semesterTranscriptDTO.setSemester(courses.get(0).getCourse().getSemester());
                 List<SubjectScoreDTO> subjectScoreDTOS = new ArrayList<>();
                 semesterTranscriptDTO.setSubjects(subjectScoreDTOS);
-                double totalScore = 0;
-                double avgScore = 0;
-                int totalCredit = 0;
-                int totalCreditPass = 0;
+                double totalScoreSub = 0;
+                double avgScoreSub = 0;
+                int totalCreditSub = 0;
+                int totalCreditPassSub = 0;
 
                 for (CourseRegistrationResult c : courses) {
-                    totalScore += c.getNumberScoreTen() * c.getCourse().getSubject().getCredit();
-                    totalCredit += c.getCourse().getSubject().getCredit();
+                    totalScoreSub += c.getNumberScoreTen() * c.getCourse().getSubject().getCredit();
+                    totalCreditSub += c.getCourse().getSubject().getCredit();
                     SubjectScoreDTO subjectScoreDTO = new SubjectScoreDTO();
                     if (c.getNumberScoreTen() >= 4) {
-                        totalCreditPass += c.getCourse().getSubject().getCredit();
+                        totalCreditPassSub += c.getCourse().getSubject().getCredit();
                         subjectScoreDTO.setPass(true);
                     }
                     subjectScoreDTO.setSubject(c.getCourse().getSubject());
@@ -118,13 +125,23 @@ public class CourseRegistrationResultController extends BaseAPI {
                     subjectScoreDTO.setLiteralScore(c.getLiteralScore());
                     subjectScoreDTOS.add(subjectScoreDTO);
                 }
-                avgScore = Math.floor(((double) totalScore / totalCredit) * 100) / 100;
-                semesterTranscriptDTO.setAvgScore(avgScore);
-                semesterTranscriptDTO.setTotalCredit(totalCreditPass);
+                avgScoreSub = Math.floor(((double) totalScoreSub / totalCreditSub) * 100) / 100;
+                semesterTranscriptDTO.setAvgScoreTen(avgScoreSub);
+                semesterTranscriptDTO.setAvgScoreFour(Math.floor((avgScoreSub / 10) * 4 * 100) / 100);
+                semesterTranscriptDTO.setTotalCredit(totalCreditPassSub);
                 semesterTranscriptDTOS.add(semesterTranscriptDTO);
+
+                //
+                totalScore += totalScoreSub;
+                totalCredit += totalCreditSub;
+                totalCreditPass += totalCreditPassSub;
             }
 
-            return ResponseEntity.ok(semesterTranscriptDTOS);
+            scoreTableDTO.setAvgScoreTen(Math.floor(((double) totalScore / totalCredit) * 100) / 100);
+            scoreTableDTO.setAvgScoreFour(Math.floor(((double) totalScore / totalCredit) / 10 * 4 * 100) / 100);
+            scoreTableDTO.setTotalCredit(totalCreditPass);
+
+            return ResponseEntity.ok(scoreTableDTO);
 
 
         } catch (Exception e) {

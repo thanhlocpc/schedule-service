@@ -32,7 +32,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         config.addAllowedOrigin("https://tutor-service.azurewebsites.net");
         config.addAllowedOrigin("http://localhost:8585");
         config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("http://localhost:3031");
+        config.addAllowedOrigin("http://localhost:3001");
         config.addAllowedOrigin("https://tutor-website-52add.web.app");
         config.addAllowedOrigin("https://tutor-admin-nlu.web.app");
         config.addAllowedHeader("*");
