@@ -30,7 +30,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         config.addAllowedOrigin("https://thanhloc.azurewebsites.net");
         config.addAllowedOrigin("http://localhost:8585");
         config.addAllowedOrigin("http://localhost:3000");
-        config.addAllowedOrigin("http://localhost:3031");
+        config.addAllowedOrigin("http://localhost:3001");
         config.addAllowedOrigin("https://schedule-web-bbbd5.web.app");
         config.addAllowedOrigin("https://admin-schedule-web.web.app");
         config.addAllowedHeader("*");
