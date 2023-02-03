@@ -18,9 +18,9 @@ public class SubjectScheduleResult extends BaseEntity{
     @JoinColumn(name = "subject_schedule_id", referencedColumnName = "id")
     private SubjectSchedule subjectSchedule;
 
+    @Column(name = "student_id")
     private Long studentId;
 
-    private Double mark;
-
+    @Column(name = "created_at")
     private Date createdAt;
 }

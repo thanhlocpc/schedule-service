@@ -13,5 +13,5 @@ public interface ICourseRegistrationResultService {
     public List<CourseRegistrationResult> getCourseRegistrationResultByStudentIdAndYearAndSemester(Long studentId,
                                                                                                    int year,
                                                                                                    int semester);
-
+    public List<CourseRegistrationResult> findCourseRegistrationResultByStudent(Long studentId);
 }
