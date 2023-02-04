@@ -63,7 +63,7 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
             ScoreTableDTO scoreTableDTO = new ScoreTableDTO();
             scoreTableDTO.setSemesterTranscripts(semesterTranscriptDTOS);
             double totalScore = 0;
-            double avgScore = 0;
+            double totalScoreFour = 0;
             int totalCredit = 0;
             int totalCreditPass = 0;
             for (Map.Entry<Integer, List<CourseRegistrationResult>> en : map.entrySet()) {
@@ -76,10 +76,13 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 double avgScoreSub = 0;
                 int totalCreditSub = 0;
                 int totalCreditPassSub = 0;
+                int totalScoreFourSub = 0;
+
 
                 for (CourseRegistrationResult c : courses) {
                     totalScoreSub += c.getNumberScoreTen() * c.getCourse().getSubject().getCredit();
                     totalCreditSub += c.getCourse().getSubject().getCredit();
+                    totalScoreFourSub += c.getNumberScoreFour() * c.getCourse().getSubject().getCredit();
                     SubjectScoreDTO subjectScoreDTO = new SubjectScoreDTO();
                     if (c.getNumberScoreTen() >= 4) {
                         totalCreditPassSub += c.getCourse().getSubject().getCredit();
@@ -93,7 +96,7 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 }
                 avgScoreSub = Math.floor(((double) totalScoreSub / totalCreditSub) * 100) / 100;
                 semesterTranscriptDTO.setAvgScoreTen(avgScoreSub);
-                semesterTranscriptDTO.setAvgScoreFour(Math.floor((avgScoreSub / 10) * 4 * 100) / 100);
+                semesterTranscriptDTO.setAvgScoreFour(Math.floor(((double)totalScoreFourSub / totalCreditSub) * 100) / 100);
                 semesterTranscriptDTO.setTotalCredit(totalCreditPassSub);
                 semesterTranscriptDTOS.add(semesterTranscriptDTO);
 
@@ -101,10 +104,13 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 totalScore += totalScoreSub;
                 totalCredit += totalCreditSub;
                 totalCreditPass += totalCreditPassSub;
+                totalScoreFour += semesterTranscriptDTO.getAvgScoreFour();
+
+                // end 1 học kì
             }
 
             scoreTableDTO.setAvgScoreTen(Math.floor(((double) totalScore / totalCredit) * 100) / 100);
-            scoreTableDTO.setAvgScoreFour(Math.floor(((double) totalScore / totalCredit) / 10 * 4 * 100) / 100);
+            scoreTableDTO.setAvgScoreFour(Math.floor(((double) totalScoreFour / scoreTableDTO.getSemesterTranscripts().size()) * 100) / 100);
             scoreTableDTO.setTotalCredit(totalCreditPass);
             return scoreTableDTO;
         } catch (Exception e) {
@@ -117,17 +123,10 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
     @Override
     public Workbook exportTimeTable(Long userId, int semester, int year) {
         // lấy ds học phần đăng kí
-        List<CourseRegistrationResult> courseRegistrationResults =
-                getCourseRegistrationResultByStudentIdAndYearAndSemester(userId, year, semester);
-        List<CourseRegistrationResultDTO> courseRegistrationResultDTOS =
-                courseRegistrationResults
-                        .stream()
-                        .map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e))
-                        .collect(Collectors.toList());
+        List<CourseRegistrationResult> courseRegistrationResults = getCourseRegistrationResultByStudentIdAndYearAndSemester(userId, year, semester);
+        List<CourseRegistrationResultDTO> courseRegistrationResultDTOS = courseRegistrationResults.stream().map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e)).collect(Collectors.toList());
         courseRegistrationResultDTOS.stream().forEach(e -> {
-            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractice() != null &&
-                    item.getId() != e.getCourseTimePractice().getId() &&
-                    item.getType().equals("TH"));
+            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractice() != null && item.getId() != e.getCourseTimePractice().getId() && item.getType().equals("TH"));
         });
         // create excel file
         XSSFWorkbook workbook = new XSSFWorkbook();
@@ -203,8 +202,7 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
         int rowIndex = 1;
         for (SemesterTranscriptDTO st : scoreTableDTO.getSemesterTranscripts()) {
             Row row = sheet.createRow(rowIndex++);
-            createCell(row, 0, "Học kì" +st.getSemester().getSemesterName() +" năm "
-                    +st.getSemester().getAcademyYear(), style);
+            createCell(row, 0, "Học kì" + st.getSemester().getSemesterName() + " năm " + st.getSemester().getAcademyYear(), style);
             int beginRow = 1;
             for (SubjectScoreDTO ss : st.getSubjects()) {
                 row = sheet.createRow(rowIndex);
@@ -248,8 +246,7 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 createCell(row, 6, courseTime.getTimeStart(), style);
                 createCell(row, 7, c.getCourse().getSubject().getLessonTime(), style);
                 createCell(row, 8, courseTime.getClassroom().getName(), style);
-                createCell(row, 9, DateUtils.dateToString(courseTime.getDateStart()) +
-                        "-" + DateUtils.dateToString(courseTime.getDateEnd()), style);
+                createCell(row, 9, DateUtils.dateToString(courseTime.getDateStart()) + "-" + DateUtils.dateToString(courseTime.getDateEnd()), style);
                 rowIndex++;
             }
         }
