@@ -29,5 +29,11 @@ public class CourseTime extends BaseEntity{
 
     private int timeStart;
 
+    private String type;
+
+    private Date dateStart;
+
+    private Date dateEnd;
+
     private Date createdAt;
 }
