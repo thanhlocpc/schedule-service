@@ -12,6 +12,7 @@ import com.schedule.app.models.dtos.score.SubjectScoreDTO;
 import com.schedule.app.models.dtos.subject_schedule.SubjectScheduleDTO;
 import com.schedule.app.services.ABaseServices;
 import com.schedule.app.services.ICourseRegistrationResultService;
+import com.schedule.app.utils.DateUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -148,8 +149,8 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
 
         int rowIndex = 1;
         for (CourseRegistrationResultDTO c : courseRegistrationResultDTOS) {
-            int beginRow = rowIndex;
             for(CourseTime courseTime: c.getCourse().getCourseTimes()){
+                int beginRow = rowIndex;
                 Row row = sheet.createRow(rowIndex);
                 createCell(row, 0, beginRow, style);
                 createCell(row, 1, c.getCourse().getSubject().getId(), style);
@@ -160,7 +161,8 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 createCell(row, 6, courseTime.getTimeStart(), style);
                 createCell(row, 7, c.getCourse().getSubject().getLessonTime(), style);
                 createCell(row, 8, courseTime.getClassroom().getName(), style);
-                createCell(row, 9, null, style);
+                createCell(row, 9, DateUtils.dateToString(courseTime.getDateStart())+
+                        "-"+DateUtils.dateToString(courseTime.getDateEnd()), style);
                 rowIndex++;
             }
         }
@@ -219,7 +221,9 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
         cell.setCellValue("Phòng");
 
         cell = row.createCell(9);
-        cell.setCellStyle(style);
+        XSSFCellStyle f = (XSSFCellStyle) style.clone();
+        f.setWrapText(true);
+        cell.setCellStyle(f);
         cell.setCellValue("Thời gian học");
     }
 }
