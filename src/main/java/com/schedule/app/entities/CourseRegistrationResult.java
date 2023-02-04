@@ -18,6 +18,10 @@ public class CourseRegistrationResult extends BaseEntity{
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private Course course;
 
+    @OneToOne
+    @JoinColumn(name = "course_time_practice", referencedColumnName = "id")
+    private CourseTime courseTimePractice;
+
     @ManyToOne
     @JoinColumn(name = "student_id", referencedColumnName = "id")
     private User user;

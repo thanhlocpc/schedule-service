@@ -1,5 +1,6 @@
 package com.schedule.app.models.dtos.course_registration_result;
 
+import com.schedule.app.entities.CourseTime;
 import com.schedule.app.models.dtos.auths.UserDTO;
 import com.schedule.app.models.dtos.course.CourseDTO;
 import lombok.AllArgsConstructor;
@@ -21,6 +22,8 @@ import java.util.Date;
 public class CourseRegistrationResultDTO implements Serializable {
 
     private CourseDTO course;
+
+    private CourseTime courseTimePractice;
 
 //    private UserDTO user;
 

@@ -123,6 +123,11 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                         .stream()
                         .map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e))
                         .collect(Collectors.toList());
+        courseRegistrationResultDTOS.stream().forEach(e->{
+            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractice() != null &&
+                    item.getId() != e.getCourseTimePractice().getId() &&
+                    item.getType().equals("TH"));
+        });
         // create excel file
         XSSFWorkbook workbook = new XSSFWorkbook();
         Sheet sheet = workbook.createSheet("thoi-khoa-bieu");

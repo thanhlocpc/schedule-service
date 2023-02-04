@@ -56,12 +56,16 @@ public class CourseRegistrationResultController extends BaseAPI {
         List<CourseRegistrationResult> courseRegistrationResults =
                 courseRegistrationResultService.
                         getCourseRegistrationResultByStudentIdAndYearAndSemester(userPrincipal.getUserId(), year, semester);
-
         List<CourseRegistrationResultDTO> courseRegistrationResultDTOS =
                 courseRegistrationResults
                         .stream()
                         .map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e))
                         .collect(Collectors.toList());
+       courseRegistrationResultDTOS.stream().forEach(e->{
+            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractice() != null &&
+                    item.getId() != e.getCourseTimePractice().getId() &&
+                    item.getType().equals("TH"));
+        });
 
         return ResponseEntity.ok(courseRegistrationResultDTOS);
     }
@@ -91,8 +95,8 @@ public class CourseRegistrationResultController extends BaseAPI {
 
     @GetMapping("/export-timetable")
     public ResponseEntity exportExcelTimeTableStudent(@RequestParam("year") int year,
-                                                     @RequestParam("semester") int semester,
-                                                     @RequestHeader("Access-Token") String accessToken) {
+                                                      @RequestParam("semester") int semester,
+                                                      @RequestHeader("Access-Token") String accessToken) {
         try {
             // lấy theo token
             String token = "";
