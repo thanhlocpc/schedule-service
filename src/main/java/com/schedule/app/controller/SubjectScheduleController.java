@@ -1,46 +1,92 @@
 package com.schedule.app.controller;
 
 import com.schedule.app.converter.SubjectScheduleConverter;
-import com.schedule.app.entities.SubjectSchedule;
+import com.schedule.app.entities.ScheduleFile;
 import com.schedule.app.entities.SubjectScheduleResult;
 import com.schedule.app.handler.ScheduleServiceException;
 import com.schedule.app.models.dtos.subject_schedule.SubjectScheduleDTO;
+import com.schedule.app.models.enums.EnumsConst;
+import com.schedule.app.repository.IScheduleFileRepository;
 import com.schedule.app.security.UserPrincipal;
+import com.schedule.app.services.IScheduleFileService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
 import lombok.experimental.ExtensionMethod;
+import models.ChangeScheduleRequest;
+import models.DateSchedule;
+import models.Schedule;
+import models.SubjectSchedule;
 import org.apache.poi.ss.usermodel.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.*;
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @ExtensionMethod(Extensions.class)
 @RestController
 @RequestMapping(Constants.SUBJECT_SCHEDULE_SERVICE_URL)
 public class SubjectScheduleController extends BaseAPI {
+    @Autowired
+    IScheduleFileService scheduleFileService;
 
+    @PostMapping("/change")
+    public ResponseEntity changeSchedule(@RequestBody List<ChangeScheduleRequest> changeSchedules) throws IOException, ClassNotFoundException, CloneNotSupportedException {
+        Schedule scheduleChange = scheduleFileService.changeSchedule(changeSchedules);
+        if (scheduleChange == null)
+            return ResponseEntity.badRequest().body("cannot change!!!!@");
+        else
+            return ResponseEntity.ok(scheduleChange);
+    }
 
-    @GetMapping("/{academyYear}")
-    public List<SubjectScheduleDTO> getSubjectSchedulesByAcademyYear(@PathVariable(name = "academyYear") Integer year) {
-        List<SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedulesByAcademyYear(year);
-//        List<SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedules();
+    @GetMapping("")
+    public List<SubjectScheduleDTO> getSubjectSchedulesByAcademyYear() throws IOException, ClassNotFoundException {
+        ScheduleFile scheduleFile = scheduleFileService.getUsedScheduleFile();
+        ByteArrayInputStream bis = new ByteArrayInputStream(scheduleFile.getFile());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        Schedule schedule = (Schedule) ois.readObject();
+        ois.close();
+//        List<SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedulesByAcademyYear(year);
+        List<DateSchedule> dateScheduleList = schedule.getDateScheduleList();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.typeMap(SubjectSchedule.class, SubjectScheduleDTO.class).addMappings(mapper -> {
             mapper.map(src -> src.getSubject().getName(), SubjectScheduleDTO::setSubjectName);
-            mapper.map(src -> src.getClassroom().getName(), SubjectScheduleDTO::setClassroomName);
-            mapper.map(src -> src.getCourse().getName(), SubjectScheduleDTO::setCourseName);
-            mapper.map(src -> src.getCourse().getSemester().getSemesterName(), SubjectScheduleDTO::setSemesterName);
-            mapper.map(src -> src.getCourse().getClassEntity().getName(), SubjectScheduleDTO::setClassName);
-            mapper.map(src -> src.getCourse().getSemester().getAcademyYear(), SubjectScheduleDTO::setAcademyYear);
+            mapper.map(src -> src.getRoom().getRoom().getName(), SubjectScheduleDTO::setClassroomName);
+            mapper.map(src -> src.getRoom().getRegistrationClass().getName(), SubjectScheduleDTO::setCourseName);
+            mapper.map(src -> "1", SubjectScheduleDTO::setSemesterName);
+            mapper.map(src -> src.getRoom().getRegistrationClass().getGrade().getName(), SubjectScheduleDTO::setClassName);
+            mapper.map(src -> "2019", SubjectScheduleDTO::setAcademyYear);
+            mapper.map(src -> (src.getShift() + 1), SubjectScheduleDTO::setShift);
         });
-        List<SubjectScheduleDTO> subjectScheduleDTO = subjectSchedules.stream().map(subjectSchedule -> modelMapper.map(subjectSchedule, SubjectScheduleDTO.class)).collect(Collectors.toList());
-        return subjectScheduleDTO;
+        List<String> types = Stream.of(EnumsConst.ExamType.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+        List<SubjectScheduleDTO> subjectScheduleDTOs = new ArrayList<>();
+        dateScheduleList.forEach(item -> {
+            item.getSubjectSchedules().forEach(ss ->
+            {
+                SubjectScheduleDTO ssDto = modelMapper.map(ss, SubjectScheduleDTO.class);
+                ssDto.setDateExam(LocalDate.parse(item.getDate()));
+                ssDto.setExamType(types.get(ss.getSubject().getExamForms()));
+                subjectScheduleDTOs.add(ssDto);
+            });
+        });
+        System.out.println("========schedule actual");
+        List<DateSchedule> dses = schedule.getDateScheduleList();
+
+        for (int i = 0; i < dses.size(); i++) {
+            System.out.println(dses.get(i).toString());
+        }
+//        List<SubjectScheduleDTO> subjectScheduleDTO = subjectSchedules.stream().map(subjectSchedule -> modelMapper.map(subjectSchedule, SubjectScheduleDTO.class)).collect(Collectors.toList());
+        return subjectScheduleDTOs;
     }
 
     @GetMapping("/student")
@@ -69,8 +115,8 @@ public class SubjectScheduleController extends BaseAPI {
 
     @GetMapping("/export-schedule")
     public ResponseEntity exportExcelScheduleStudent(@RequestParam("year") int year,
-                                                @RequestParam("semester") int semester,
-                                                @RequestHeader("Access-Token") String accessToken) {
+                                                     @RequestParam("semester") int semester,
+                                                     @RequestHeader("Access-Token") String accessToken) {
         try {
             // lấy theo token
             String token = "";
