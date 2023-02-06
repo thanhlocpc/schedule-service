@@ -10,9 +10,7 @@ import models.Schedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -64,6 +62,14 @@ public class ScheduleFileService implements IScheduleFileService {
             ObjectInputStream oisAC = new ObjectInputStream(bisAC);
             scheduleAfterChange = (Schedule) oisAC.readObject();
             ois.close();
+            scheduleFile.setFileStatus(FileStatus.DELETE);
+            scheduleFileRepository.save(scheduleFile);
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            ObjectOutputStream oos = new ObjectOutputStream(bos);
+            oos.writeObject(scheduleAfterChange);
+            byte[] buff = bos.toByteArray();
+            addScheduleFile(new ScheduleFile(buff,FileStatus.USED));
         }
 
         return scheduleAfterChange;
