@@ -15,7 +15,7 @@ public class CourseRegistrationResultConverter {
                 .builder()
 //                .user(UserConverter.toUserDTO(course.getUser()))
                 .course(CourseConverter.toCourseDTO(course.getCourse()))
-                .courseTimePractice(course.getCourseTimePractice())
+                .courseTimePractices(course.getCourseTimePractices())
                 .build();
         return res;
     }

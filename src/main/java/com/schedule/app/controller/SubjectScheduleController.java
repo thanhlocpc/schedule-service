@@ -59,7 +59,7 @@ public class SubjectScheduleController extends BaseAPI {
         }
 
         // lấy ds lịch thi
-        List<SubjectScheduleResult> subjectScheduleResults = courseRegisterResultRepository.getSubjectScheduleByStudentIdAndYearAndSemester(userPrincipal.getUserId(), year, semester);
+        List<SubjectScheduleResult> subjectScheduleResults = courseRegisterResultRepository.getSubjectScheduleByUserIdAndYearAndSemester(userPrincipal.getUserId(), year, semester);
         if (subjectScheduleResults != null && !subjectScheduleResults.isEmpty()) {
             List<SubjectScheduleDTO> subjectScheduleDTO = subjectScheduleResults.stream().map(subjectSchedule -> SubjectScheduleConverter.toSubjectScheduleDTO(subjectSchedule.getSubjectSchedule())).collect(Collectors.toList());
             return ResponseEntity.ok(subjectScheduleDTO);

@@ -23,12 +23,12 @@ public class SubjectSchedule extends BaseEntity{
     private Course course;
 
     @Column(nullable = false)
-    private int shift;
+    private Integer shift;
 
     @Column(nullable = false)
     private LocalDate dateExam;
 
-    private int subjectScheduleIndex;
+    private Integer subjectScheduleIndex;
 
-    private int candidateAmount;
+    private Integer candidateAmount;
 }

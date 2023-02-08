@@ -11,6 +11,6 @@ import java.util.List;
  */
 public interface ISubjectScheduleResultService{
 
-    List<SubjectScheduleResult> getSubjectScheduleByStudentIdAndYearAndSemester(Long studentId, int year, int semester);
+    List<SubjectScheduleResult> getSubjectScheduleByUserIdAndYearAndSemester(Long studentId, int year, int semester);
 
 }

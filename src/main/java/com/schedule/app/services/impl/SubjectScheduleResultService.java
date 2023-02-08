@@ -12,7 +12,7 @@ import java.util.List;
  */
 public class SubjectScheduleResultService extends ABaseServices implements ISubjectScheduleResultService {
     @Override
-    public List<SubjectScheduleResult> getSubjectScheduleByStudentIdAndYearAndSemester(Long studentId, int year, int semester) {
-        return subjectScheduleResultRepository.getSubjectScheduleByStudentIdAndYearAndSemester(studentId, year, semester);
+    public List<SubjectScheduleResult> getSubjectScheduleByUserIdAndYearAndSemester(Long studentId, int year, int semester) {
+        return subjectScheduleResultRepository.getSubjectScheduleByUserIdAndYearAndSemester(studentId, year, semester);
     }
 }

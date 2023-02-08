@@ -38,7 +38,7 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
         // lấy ds lịch thi
         List<SubjectScheduleDTO> subjectScheduleDTO = new ArrayList<>();
         List<SubjectScheduleResult> subjectScheduleResults = subjectScheduleResultRepository.
-                getSubjectScheduleByStudentIdAndYearAndSemester(uid, year, semester);
+                getSubjectScheduleByUserIdAndYearAndSemester(uid, year, semester);
         if (subjectScheduleResults != null && !subjectScheduleResults.isEmpty()) {
             subjectScheduleDTO = subjectScheduleResults.stream().map(subjectSchedule -> SubjectScheduleConverter.toSubjectScheduleDTO(subjectSchedule.getSubjectSchedule())).collect(Collectors.toList());
         }

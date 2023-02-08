@@ -18,21 +18,20 @@ public class CourseRegistrationResult extends BaseEntity{
     @JoinColumn(name = "course_id", referencedColumnName = "id")
     private Course course;
 
-    @OneToOne
-    @JoinColumn(name = "course_time_practice", referencedColumnName = "id")
-    private CourseTime courseTimePractice;
+    @Column(name = "course_time_practices")
+    private String courseTimePractices;
 
     @ManyToOne
-    @JoinColumn(name = "student_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    private double numberScoreFour;
+    private Double numberScoreFour;
 
-    private double numberScoreTen;
+    private Double numberScoreTen;
 
     private String literalScore;
 
-    private boolean isPass;
+    private Boolean isPass;
 
     private Date createdAt;
 }

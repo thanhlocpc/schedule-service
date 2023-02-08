@@ -23,7 +23,7 @@ public class CourseRegistrationResultDTO implements Serializable {
 
     private CourseDTO course;
 
-    private CourseTime courseTimePractice;
+    private String courseTimePractices;
 
 //    private UserDTO user;
 

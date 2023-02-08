@@ -18,8 +18,8 @@ public class SubjectScheduleResult extends BaseEntity{
     @JoinColumn(name = "subject_schedule_id", referencedColumnName = "id")
     private SubjectSchedule subjectSchedule;
 
-    @Column(name = "student_id")
-    private Long studentId;
+    @Column(name = "user_id")
+    private Long userId;
 
     @Column(name = "created_at")
     private Date createdAt;
