@@ -61,10 +61,12 @@ public class CourseRegistrationResultController extends BaseAPI {
                         .stream()
                         .map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e))
                         .collect(Collectors.toList());
-       courseRegistrationResultDTOS.stream().forEach(e->{
-            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractice() != null &&
-                    item.getId() != e.getCourseTimePractice().getId() &&
+        courseRegistrationResultDTOS.stream().forEach(e -> {
+            List<String> courseTimePractices = Arrays.stream(e.getCourseTimePractices().split(",")).collect(Collectors.toList());
+            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractices() != null &&
+                    !courseTimePractices.contains(item.getId() + "") &&
                     item.getType().equals("TH"));
+
         });
 
         return ResponseEntity.ok(courseRegistrationResultDTOS);

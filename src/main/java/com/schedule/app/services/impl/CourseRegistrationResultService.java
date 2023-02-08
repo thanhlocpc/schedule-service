@@ -20,10 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -126,7 +123,10 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
         List<CourseRegistrationResult> courseRegistrationResults = getCourseRegistrationResultByStudentIdAndYearAndSemester(userId, year, semester);
         List<CourseRegistrationResultDTO> courseRegistrationResultDTOS = courseRegistrationResults.stream().map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e)).collect(Collectors.toList());
         courseRegistrationResultDTOS.stream().forEach(e -> {
-            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractice() != null && item.getId() != e.getCourseTimePractice().getId() && item.getType().equals("TH"));
+            List<String> courseTimePractices = Arrays.stream(e.getCourseTimePractices().split(",")).collect(Collectors.toList());
+            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractices() != null &&
+                    !courseTimePractices.contains(item.getId() + "") &&
+                    item.getType().equals("TH"));
         });
         // create excel file
         XSSFWorkbook workbook = new XSSFWorkbook();

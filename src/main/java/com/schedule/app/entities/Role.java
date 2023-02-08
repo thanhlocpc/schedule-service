@@ -20,9 +20,4 @@ public class Role{
     private String id;
 
     private String roleName;
-
-    @OneToMany(cascade = CascadeType.REFRESH)
-    @JoinTable(name = "role_permission", joinColumns = {@JoinColumn(name = "role_id")},
-            inverseJoinColumns = {@JoinColumn(name = "permission_id")})
-    private Set<Permission> permissions = new HashSet<>();
 }

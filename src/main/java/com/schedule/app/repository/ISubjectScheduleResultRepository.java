@@ -15,7 +15,7 @@ public interface ISubjectScheduleResultRepository extends JpaRepository<SubjectS
 
 
     @Query("select distinct c from SubjectScheduleResult c join SubjectSchedule ss on c.subjectSchedule.course.id = ss.course.id join Semester s on " +
-            "s.academyYear = :year and s.semesterName = :semester where c.studentId = :studentId")
-    List<SubjectScheduleResult> getSubjectScheduleByStudentIdAndYearAndSemester(@Param("studentId") Long studentId, @Param("year") int year,
+            "s.academyYear = :year and s.semesterName = :semester where c.userId = :userId")
+    List<SubjectScheduleResult> getSubjectScheduleByUserIdAndYearAndSemester(@Param("userId") Long userId, @Param("year") int year,
                                                                                 @Param("semester") int semester);
 }
