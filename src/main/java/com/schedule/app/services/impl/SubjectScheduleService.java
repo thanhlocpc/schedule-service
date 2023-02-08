@@ -69,11 +69,12 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
             createCell(row, 0, beginRow, style);
             createCell(row, 1, subjectSchedule.getSubjectId(), style);
             createCell(row, 2, subjectSchedule.getSubjectName(), style);
-            createCell(row, 3, subjectSchedule.getDateExam().toString(), style);
-            createCell(row, 4, subjectSchedule.getClassroomName(), style);
-            createCell(row, 5, subjectSchedule.getLessonEnd(), style);
-            createCell(row, 6, subjectSchedule.getLessonEnd(), style);
-            createCell(row, 7, subjectSchedule.getExamType(), style);
+            createCell(row, 3, subjectSchedule.getCourseName(), style);
+            createCell(row, 4, subjectSchedule.getDateExam().toString(), style);
+            createCell(row, 5, subjectSchedule.getClassroomName(), style);
+            createCell(row, 6, subjectSchedule.getLessonStart(), style);
+            createCell(row, 7, subjectSchedule.getLessonEnd(), style);
+            createCell(row, 8, subjectSchedule.getExamType(), style);
             rowIndex++;
         }
     }
@@ -109,21 +110,25 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
 
         cell = row.createCell(3);
         cell.setCellStyle(style);
-        cell.setCellValue("Ngày thi");
+        cell.setCellValue("Nhóm HP");
 
         cell = row.createCell(4);
         cell.setCellStyle(style);
-        cell.setCellValue("Phòng thi");
+        cell.setCellValue("Ngày thi");
 
         cell = row.createCell(5);
         cell.setCellStyle(style);
-        cell.setCellValue("Tiết bắt đầu");
+        cell.setCellValue("Phòng thi");
 
         cell = row.createCell(6);
         cell.setCellStyle(style);
-        cell.setCellValue("Số tiết");
+        cell.setCellValue("Tiết bắt đầu");
 
         cell = row.createCell(7);
+        cell.setCellStyle(style);
+        cell.setCellValue("Số tiết");
+
+        cell = row.createCell(8);
         cell.setCellStyle(style);
         cell.setCellValue("Hình thức thi");
     }
