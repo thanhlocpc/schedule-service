@@ -89,7 +89,7 @@ public class SendMail {
     public static void sendMailOTP(String toEmail, int code) throws UnsupportedEncodingException, MessagingException {
         final String fromEmail = "nguyentraipro115@gmail.com";
         // Mat khai email cua ban
-        final String password = "wexpkjbizfkqskgp";
+        final String password = "hponpoaskjkhxwnf";
         // dia chi email nguoi nhan
         final String subject = "Quên mật khẩu";
         final String body = "Vui lòng nhập mã OTP này đễ lấy lại mật khẩu: " +code+"\n"+

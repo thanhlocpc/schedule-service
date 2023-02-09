@@ -5,6 +5,7 @@ import com.schedule.app.repository.IOtpRepository;
 import com.schedule.app.repository.ISubjectScheduleResultRepository;
 import com.schedule.app.services.ICourseRegistrationResultService;
 import com.schedule.app.services.ISubjectScheduleService;
+import com.schedule.app.services.IUserLoginService;
 import com.schedule.app.services.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,6 +34,9 @@ public abstract class BaseAPI {
     //service
     @Autowired
     protected IUserService userService;
+
+    @Autowired
+    protected IUserLoginService userLoginService;
 
     @Autowired
     protected ISubjectScheduleService subjectScheduleService;

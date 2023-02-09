@@ -12,7 +12,7 @@ import java.util.Date;
 
 /**
  * @author : Thành Lộc
- * @since : 08/02/2022
+ * @since : 02/08/2022
  **/
 @Entity
 @Table(name = "`otp`")
