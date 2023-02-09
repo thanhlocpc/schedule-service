@@ -4,6 +4,7 @@ import com.schedule.app.annotations.swagger.RequiredHeaderToken;
 import com.schedule.app.entities.*;
 import com.schedule.app.handler.ScheduleServiceException;
 import com.schedule.app.models.dtos.auths.LoginDTO;
+import com.schedule.app.models.dtos.auths.ValidateOtpInpoutDTO;
 import com.schedule.app.models.requests.RefreshTokenRequest;
 import com.schedule.app.models.responses.JwtResponse;
 import com.schedule.app.models.wrapper.ObjectResponseWrapper;
@@ -11,6 +12,7 @@ import com.schedule.app.security.UserPrincipal;
 import com.schedule.app.services.IRefreshTokenService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
+import com.schedule.app.utils.SendMail;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.experimental.ExtensionMethod;
@@ -20,8 +22,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import javax.validation.Valid;
 
+import java.io.UnsupportedEncodingException;
 import java.util.*;
 
 /**
@@ -110,5 +114,60 @@ public class AuthController extends BaseAPI {
                 .build();
     }
 
+
+    @GetMapping("/forgot-password")
+    @Operation(summary = "Quên mật khẩu")
+    public ObjectResponseWrapper forgotPassword(@RequestParam(required = true) String email) throws MessagingException, UnsupportedEncodingException {
+
+        try {
+            User user = userService.findByEmail(email);
+
+            if (user == null) {
+                throw new ScheduleServiceException("Không tìm thấy user này.");
+            }
+            int otp = new Random().nextInt(1000000 - 100000) + 100000;
+            SendMail.sendMailOTP(email, otp);
+            otpRepository.save(new Otp(user.getId(), (long) otp, Calendar.getInstance().getTime()));
+            return ObjectResponseWrapper.builder()
+                    .status(1)
+                    .message("Vui lòng kiểm tra OTP trong email.")
+                    .build();
+        }catch (Exception e){
+            return ObjectResponseWrapper.builder()
+                    .status(1)
+                    .message("Vui lòng thử lại.")
+                    .build();
+        }
+
+    }
+
+    @PostMapping("/forgot-password")
+    @Operation(summary = "Cập nhật mật khẩu mới")
+    public ObjectResponseWrapper verifyOTP(@RequestBody(required = true) ValidateOtpInpoutDTO validateOtpInpoutDTO) {
+        User user = userService.findByEmail(validateOtpInpoutDTO.getEmail());
+        if (user == null) {
+            throw new ScheduleServiceException("Không tìm thấy user này.");
+        }
+
+        Otp otp = otpRepository.findOtpByUserId(user.getId());
+        if (otp == null) {
+            throw new ScheduleServiceException("OTP không hợp lệ.");
+        }
+        if (otp.getOtp() != validateOtpInpoutDTO.getOtp()) {
+            throw new ScheduleServiceException("OTP không hợp lệ.");
+        }
+        if (Calendar.getInstance().getTime().getTime() - otp.getCreatedAt().getTime() > 2 * 60 * 1000) {
+            throw new ScheduleServiceException("OTP hết hạn.");
+        }
+
+        UserLogin userLogin = userLoginService.findUserLoginByUserId(user.getId());
+        userLogin.setPassword(new BCryptPasswordEncoder().encode(validateOtpInpoutDTO.getPassword().trim()));
+        userLoginService.save(userLogin);
+        otpRepository.delete(otp);
+        return ObjectResponseWrapper.builder()
+                .status(1)
+                .message("Success")
+                .build();
+    }
 
 }
