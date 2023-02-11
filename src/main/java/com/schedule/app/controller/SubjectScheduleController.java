@@ -42,7 +42,7 @@ public class SubjectScheduleController extends BaseAPI {
     public ResponseEntity changeSchedule(@RequestBody List<ChangeScheduleRequest> changeSchedules) throws IOException, ClassNotFoundException, CloneNotSupportedException {
         Schedule scheduleChange = scheduleFileService.changeSchedule(changeSchedules);
         if (scheduleChange == null)
-            return ResponseEntity.badRequest().body("cannot change!!!!@");
+            return ResponseEntity.badRequest().body(null);
         else
             return ResponseEntity.ok(scheduleChange);
     }

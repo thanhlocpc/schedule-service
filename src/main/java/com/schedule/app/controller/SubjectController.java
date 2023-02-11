@@ -6,12 +6,17 @@ import com.schedule.app.services.ISubjectService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
 import lombok.experimental.ExtensionMethod;
+import models.Schedule;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -29,7 +34,15 @@ public class SubjectController {
     }
 
     @PostMapping("/newSchedule")
-    public void generateNewSchedule() throws IOException, InterruptedException, CloneNotSupportedException {
-        scheduleFileService.generateNewSchedule();
+    public ResponseEntity generateNewSchedule() throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
+       Schedule schedule= scheduleFileService.generateNewSchedule();
+        Workbook workbook = scheduleFileService.exportSchedule(1L, 1,2020,schedule);
+        String fileName = "lich-thi" + ".xlsx";
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        workbook.write(outputStream);
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                .header("content-disposition", "attachment;filename=" + fileName)
+                .body(outputStream.toByteArray());
     }
 }
