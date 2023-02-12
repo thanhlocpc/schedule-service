@@ -13,8 +13,13 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ScheduleFile extends BaseEntity{
+    private String fileName;
     @Lob
     private byte[] file;
     @Enumerated(EnumType.STRING)
     private FileStatus fileStatus;
+
+    @ManyToOne
+    @JoinColumn(name = "semester_id")
+    private Semester semester;
 }

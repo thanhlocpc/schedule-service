@@ -14,11 +14,11 @@ public class Course extends BaseEntity{
     @NotNull
     private String name;
 
-    private int estimatedClassSize;
+    private Integer estimatedClassSize;
 
     @Column(nullable = false)
     @NotNull
-    private int realClassSize;
+    private Integer realClassSize;
 
     @ManyToOne
     @JoinColumn(name = "subject_id")

@@ -1,6 +1,8 @@
 package com.schedule.app.entities;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -9,6 +11,8 @@ import java.time.LocalDate;
 @Entity
 @Table(name = "subject_schedule")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class SubjectSchedule extends BaseEntity{
     @ManyToOne
     @JoinColumn(name = "subject_id")
@@ -23,12 +27,12 @@ public class SubjectSchedule extends BaseEntity{
     private Course course;
 
     @Column(nullable = false)
-    private int shift;
+    private Integer shift;
 
     @Column(nullable = false)
     private LocalDate dateExam;
 
-    private int subjectScheduleIndex;
+    private Integer subjectScheduleIndex;
 
-    private int candidateAmount;
+    private Integer candidateAmount;
 }

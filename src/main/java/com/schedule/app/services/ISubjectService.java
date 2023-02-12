@@ -6,5 +6,6 @@ import java.io.IOException;
 import java.util.List;
 
 public interface ISubjectService {
-    List<SubjectDTO> getSubjectWithDate() throws IOException, ClassNotFoundException;
+    List<SubjectDTO> getSubjectWithDateByFileName(String fileName) throws IOException, ClassNotFoundException;
+    List<SubjectDTO> getSubjectWithDate();
 }

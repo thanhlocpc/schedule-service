@@ -64,7 +64,7 @@ public class UserService extends ABaseServices implements IUserService {
             if (null != userNet.getRoles()) {
                 userNet.getRoles().forEach(r -> {
                     authorities.add(r.getId());
-                    r.getPermissions().forEach(p -> authorities.add(p.getId()));
+//                    r.getPermissions().forEach(p -> authorities.add(p.getId()));
                 });
             }
             userPrincipal.setAuthorities(authorities);

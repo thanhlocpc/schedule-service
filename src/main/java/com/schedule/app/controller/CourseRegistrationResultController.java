@@ -61,10 +61,12 @@ public class CourseRegistrationResultController extends BaseAPI {
                         .stream()
                         .map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e))
                         .collect(Collectors.toList());
-       courseRegistrationResultDTOS.stream().forEach(e->{
-            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractice() != null &&
-                    item.getId() != e.getCourseTimePractice().getId() &&
+        courseRegistrationResultDTOS.stream().forEach(e -> {
+            List<String> courseTimePractices = Arrays.stream(e.getCourseTimePractices().split(",")).collect(Collectors.toList());
+            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractices() != null &&
+                    !courseTimePractices.contains(item.getId() + "") &&
                     item.getType().equals("TH"));
+
         });
 
         return ResponseEntity.ok(courseRegistrationResultDTOS);
@@ -109,6 +111,34 @@ public class CourseRegistrationResultController extends BaseAPI {
             }
 
             Workbook workbook = courseRegistrationResultService.exportTimeTable(userPrincipal.getUserId(), semester, year);
+            String fileName = "lich-thi" + ".xlsx";
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
+                    .header("content-disposition", "attachment;filename=" + fileName)
+                    .body(outputStream.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok(Collections.EMPTY_LIST);
+    }
+
+    @GetMapping("/export-score-table")
+    public ResponseEntity exportExcelScoreTableStudent(@RequestHeader("Access-Token") String accessToken) {
+        try {
+            // lấy theo token
+            String token = "";
+            if (accessToken != null && accessToken.length() > 6) {
+                token = accessToken.substring(6);
+            }
+            UserPrincipal userPrincipal = jwtUtil.getUserFromToken(token);
+            if (userPrincipal == null) {
+                throw new ScheduleServiceException("Không tìm thấy user này.");
+            }
+
+            Workbook workbook = courseRegistrationResultService.exportScoreTable(userPrincipal.getUserId());
             String fileName = "lich-thi" + ".xlsx";
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);

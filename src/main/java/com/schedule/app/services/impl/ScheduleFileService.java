@@ -1,9 +1,8 @@
 package com.schedule.app.services.impl;
 
-import com.schedule.app.converter.SubjectScheduleConverter;
 import com.schedule.app.entities.ScheduleFile;
-import com.schedule.app.entities.SubjectScheduleResult;
-import com.schedule.app.models.dtos.subject_schedule.SubjectScheduleDTO;
+import com.schedule.app.entities.Semester;
+import com.schedule.app.models.dtos.schedule_file.ScheduleFileDTO;
 import com.schedule.app.models.enums.EnumsConst;
 import com.schedule.app.models.enums.FileStatus;
 import com.schedule.app.repository.IScheduleFileRepository;
@@ -18,13 +17,13 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.*;
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,7 +53,9 @@ public class ScheduleFileService implements IScheduleFileService {
         dates.add("2022-10-20");
         GWO gwo = new GWO(dates);
         byte[] scheduleByteArray = gwo.generateNewSchedule(1);
-        addScheduleFile(new ScheduleFile(scheduleByteArray, FileStatus.NEW));
+        Semester semester=new Semester(1,2021);
+        semester.setId(1L);
+        addScheduleFile(new ScheduleFile(LocalDateTime.now().toString(),scheduleByteArray, FileStatus.NEW,semester));
 
         Schedule schedule=gwo.convertByteToSchedule(scheduleByteArray);
       return schedule;
@@ -64,6 +65,18 @@ public class ScheduleFileService implements IScheduleFileService {
     @Override
     public ScheduleFile getUsedScheduleFile() {
         return scheduleFileRepository.getUsedScheduleFile();
+    }
+
+    @Override
+    public ScheduleFile getScheduleFileByFileName(String fileName) {
+        System.out.println(fileName);
+        return scheduleFileRepository.getScheduleFileByName(fileName);
+    }
+
+    @Override
+    public List<ScheduleFileDTO> getAllScheduleFile() {
+
+        return scheduleFileRepository.findAll().stream().map(item->new ScheduleFileDTO(item.getFileName(),item.getFileStatus())).collect(Collectors.toList());
     }
 
     @Override
@@ -83,10 +96,8 @@ public class ScheduleFileService implements IScheduleFileService {
             ObjectInputStream oisAC = new ObjectInputStream(bisAC);
             scheduleAfterChange = (Schedule) oisAC.readObject();
             ois.close();
-            scheduleFile.setFileStatus(FileStatus.DELETE);
             scheduleFileRepository.save(scheduleFile);
-
-            addScheduleFile(new ScheduleFile(scheduleAfterChangeByteArray,FileStatus.USED));
+            addScheduleFile(new ScheduleFile(LocalDateTime.now().toString(),scheduleAfterChangeByteArray,FileStatus.CHANGE,scheduleFile.getSemester()));
         }
 
         return scheduleAfterChange;
@@ -100,6 +111,12 @@ public class ScheduleFileService implements IScheduleFileService {
         buildHeader(workbook, sheet);
         buildData(workbook, sheet, schedule.getDateScheduleList());
         return workbook;
+    }
+    @Override
+    public void setFileUsedToStatus(FileStatus fileStatus){
+        ScheduleFile scheduleFile=getUsedScheduleFile();
+        scheduleFile.setFileStatus(fileStatus);
+        scheduleFileRepository.save(scheduleFile);
     }
     private void buildData(XSSFWorkbook workbook, Sheet sheet, List<DateSchedule> dateSchedules) {
 

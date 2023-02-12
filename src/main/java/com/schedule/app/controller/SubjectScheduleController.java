@@ -7,8 +7,10 @@ import com.schedule.app.handler.ScheduleServiceException;
 import com.schedule.app.models.dtos.subject_schedule.SubjectScheduleDTO;
 import com.schedule.app.models.enums.EnumsConst;
 import com.schedule.app.repository.IScheduleFileRepository;
+import com.schedule.app.repository.ISubjectScheduleRepository;
 import com.schedule.app.security.UserPrincipal;
 import com.schedule.app.services.IScheduleFileService;
+import com.schedule.app.services.ISubjectScheduleService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
 import lombok.experimental.ExtensionMethod;
@@ -23,6 +25,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -33,8 +36,11 @@ import java.util.stream.Stream;
 
 @ExtensionMethod(Extensions.class)
 @RestController
-@RequestMapping(Constants.SUBJECT_SCHEDULE_SERVICE_URL)
+@RequestMapping(Constants.  SUBJECT_SCHEDULE_SERVICE_URL)
 public class SubjectScheduleController extends BaseAPI {
+    @Autowired
+    ISubjectScheduleService subjectScheduleService;
+
     @Autowired
     IScheduleFileService scheduleFileService;
 
@@ -47,9 +53,35 @@ public class SubjectScheduleController extends BaseAPI {
             return ResponseEntity.ok(scheduleChange);
     }
 
-    @GetMapping("")
-    public List<SubjectScheduleDTO> getSubjectSchedulesByAcademyYear() throws IOException, ClassNotFoundException {
-        ScheduleFile scheduleFile = scheduleFileService.getUsedScheduleFile();
+    @PostMapping("/as-default/{fileName}")
+    public ResponseEntity setDefaultSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
+        subjectScheduleService.setDefaultSubjectSchedule(fileName);
+        return ResponseEntity.ok().build();
+    }
+    @GetMapping("/using/{academyYear}")
+    public List<SubjectScheduleDTO> getSubjectSchedulesByAcademyYear(@PathVariable(name = "academyYear") Integer year) {
+        List<com.schedule.app.entities.SubjectSchedule> subjectSchedules=  subjectScheduleService.getSubjectSchedulesByAcademyYear(year);
+//        List<SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedules();
+        ModelMapper modelMapper = new ModelMapper();
+        modelMapper.typeMap(com.schedule.app.entities.SubjectSchedule.class, SubjectScheduleDTO.class)
+                .addMappings(mapper -> {
+                    mapper.map(src -> src.getSubject().getName(), SubjectScheduleDTO::setSubjectName);
+                    mapper.map(src -> src.getClassroom().getName(), SubjectScheduleDTO::setClassroomName);
+                    mapper.map(src -> src.getCourse().getName(), SubjectScheduleDTO::setCourseName);
+                    mapper.map(src -> src.getCourse().getSemester().getSemesterName(), SubjectScheduleDTO::setSemesterName);
+                    mapper.map(src -> src.getCourse().getClassEntity().getName(), SubjectScheduleDTO::setClassName);
+                    mapper.map(src -> src.getCourse().getSemester().getAcademyYear(), SubjectScheduleDTO::setAcademyYear);
+                });
+        List<SubjectScheduleDTO> subjectScheduleDTO = subjectSchedules
+                .stream()
+                .map(subjectSchedule -> modelMapper.map(subjectSchedule, SubjectScheduleDTO.class))
+                .collect(Collectors.toList());
+        return subjectScheduleDTO;
+    }
+    @GetMapping("/{fileName}")
+    public List<SubjectScheduleDTO> getSubjectSchedules(@PathVariable("fileName")String fileName) throws IOException, ClassNotFoundException {
+        System.out.println("controller "+fileName);
+        ScheduleFile scheduleFile = scheduleFileService.getScheduleFileByFileName(fileName);
         ByteArrayInputStream bis = new ByteArrayInputStream(scheduleFile.getFile());
         ObjectInputStream ois = new ObjectInputStream(bis);
         Schedule schedule = (Schedule) ois.readObject();
@@ -105,7 +137,7 @@ public class SubjectScheduleController extends BaseAPI {
         }
 
         // lấy ds lịch thi
-        List<SubjectScheduleResult> subjectScheduleResults = courseRegisterResultRepository.getSubjectScheduleByStudentIdAndYearAndSemester(userPrincipal.getUserId(), year, semester);
+        List<SubjectScheduleResult> subjectScheduleResults = courseRegisterResultRepository.getSubjectScheduleByUserIdAndYearAndSemester(userPrincipal.getUserId(), year, semester);
         if (subjectScheduleResults != null && !subjectScheduleResults.isEmpty()) {
             List<SubjectScheduleDTO> subjectScheduleDTO = subjectScheduleResults.stream().map(subjectSchedule -> SubjectScheduleConverter.toSubjectScheduleDTO(subjectSchedule.getSubjectSchedule())).collect(Collectors.toList());
             return ResponseEntity.ok(subjectScheduleDTO);

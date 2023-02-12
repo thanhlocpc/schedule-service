@@ -26,9 +26,14 @@ public class SubjectService implements ISubjectService {
     ISubjectRepository subjectRepository;
     @Autowired
     IScheduleFileRepository scheduleFileRepository;
+
     @Override
-    public List<SubjectDTO> getSubjectWithDate() throws IOException, ClassNotFoundException {
-        ScheduleFile scheduleFile=scheduleFileRepository.getUsedScheduleFile();
+    public List<SubjectDTO> getSubjectWithDate(){
+        return subjectRepository.getSubjectWithDate();
+    }
+    @Override
+    public List<SubjectDTO> getSubjectWithDateByFileName(String fileName) throws IOException, ClassNotFoundException {
+        ScheduleFile scheduleFile=scheduleFileRepository.getScheduleFileByName(fileName);
         ByteArrayInputStream bis=new ByteArrayInputStream(scheduleFile.getFile());
         ObjectInputStream ois = new ObjectInputStream(bis);
         Schedule schedule= (Schedule) ois.readObject();

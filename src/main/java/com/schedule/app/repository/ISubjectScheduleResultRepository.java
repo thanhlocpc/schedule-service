@@ -1,7 +1,9 @@
 package com.schedule.app.repository;
 
+import com.schedule.app.entities.Semester;
 import com.schedule.app.entities.SubjectScheduleResult;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -15,7 +17,11 @@ public interface ISubjectScheduleResultRepository extends JpaRepository<SubjectS
 
 
     @Query("select distinct c from SubjectScheduleResult c join SubjectSchedule ss on c.subjectSchedule.course.id = ss.course.id join Semester s on " +
-            "s.academyYear = :year and s.semesterName = :semester where c.studentId = :studentId")
-    List<SubjectScheduleResult> getSubjectScheduleByStudentIdAndYearAndSemester(@Param("studentId") Long studentId, @Param("year") int year,
+            "s.academyYear = :year and s.semesterName = :semester where c.userId = :userId")
+    List<SubjectScheduleResult> getSubjectScheduleByUserIdAndYearAndSemester(@Param("userId") Long userId, @Param("year") int year,
                                                                                 @Param("semester") int semester);
+
+    @Modifying
+    @Query("delete from SubjectScheduleResult ssr where ssr.subjectSchedule in (select ss from SubjectSchedule ss where ss.course in (select c from Course c where c.semester=:semester))")
+    void deleteSubjectScheduleResultBySemester(@Param("semester") Semester semester);
 }

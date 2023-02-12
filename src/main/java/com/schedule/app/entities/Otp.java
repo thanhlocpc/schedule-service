@@ -6,20 +6,26 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.validation.constraints.NotNull;
+import java.util.Date;
 
+/**
+ * @author : Thành Lộc
+ * @since : 02/08/2022
+ **/
 @Entity
-@Table(name = "semester")
+@Table(name = "`otp`")
 @Data
-@NotNull
 @AllArgsConstructor
 @NoArgsConstructor
-public class Semester extends  BaseEntity{
-    @Column(nullable = false)
-    private int semesterName;
+public class Otp {
 
-    @Column(nullable = false)
-    private int academyYear;
+    @Id
+    @Column(name = "user_id")
+    private Long userId;
 
+    private Long otp;
+
+    private Date createdAt;
 }

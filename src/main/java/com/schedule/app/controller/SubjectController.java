@@ -11,11 +11,9 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+import javax.websocket.server.PathParam;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
@@ -28,11 +26,18 @@ public class SubjectController {
     private ISubjectService subjectService;
     @Autowired
     private IScheduleFileService scheduleFileService;
+    @GetMapping("/schedule/{fileName}")
+    public List<SubjectDTO> getSubjectWithFileName(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
+        return subjectService.getSubjectWithDateByFileName(fileName);
+    }
     @GetMapping("/schedule")
-    public List<SubjectDTO> getSubjectWithDate() throws IOException, ClassNotFoundException {
+    public List<SubjectDTO> getSubjectWithDate(){
         return subjectService.getSubjectWithDate();
     }
-
+    @GetMapping("/schedule-files")
+    public ResponseEntity getAllSchdeduleFile(){
+        return ResponseEntity.ok().body(scheduleFileService.getAllScheduleFile());
+    }
     @PostMapping("/newSchedule")
     public ResponseEntity generateNewSchedule() throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
        Schedule schedule= scheduleFileService.generateNewSchedule();

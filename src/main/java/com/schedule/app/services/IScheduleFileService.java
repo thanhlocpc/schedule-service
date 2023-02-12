@@ -1,6 +1,8 @@
 package com.schedule.app.services;
 
 import com.schedule.app.entities.ScheduleFile;
+import com.schedule.app.models.dtos.schedule_file.ScheduleFileDTO;
+import com.schedule.app.models.enums.FileStatus;
 import models.ChangeScheduleRequest;
 import models.Schedule;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -12,7 +14,10 @@ public interface IScheduleFileService {
     void addScheduleFile(ScheduleFile scheduleFile);
     Schedule generateNewSchedule() throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException;
     ScheduleFile getUsedScheduleFile();
-
+    ScheduleFile getScheduleFileByFileName(String fileName);
+    List<ScheduleFileDTO> getAllScheduleFile();
     Schedule changeSchedule(List<ChangeScheduleRequest> changeScheduleRequests) throws IOException, ClassNotFoundException, CloneNotSupportedException;
      Workbook exportSchedule(Long uid, int semester, int year, Schedule schedule);
+
+    void setFileUsedToStatus(FileStatus fileStatus);
 }

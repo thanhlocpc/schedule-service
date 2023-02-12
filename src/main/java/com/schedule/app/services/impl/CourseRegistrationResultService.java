@@ -20,10 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -34,7 +31,7 @@ import java.util.stream.Collectors;
 public class CourseRegistrationResultService extends ABaseServices implements ICourseRegistrationResultService {
     @Override
     public List<CourseRegistrationResult> getCourseRegistrationResultByStudentIdAndYearAndSemester(Long studentId, int year, int semester) {
-        return courseRegistrationResultRepository.findCourseRegistrationResultByStudentAndSemester(studentId,year,semester);
+        return courseRegistrationResultRepository.findCourseRegistrationResultByStudentAndSemester(studentId, year, semester);
     }
 
     @Override
@@ -63,7 +60,7 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
             ScoreTableDTO scoreTableDTO = new ScoreTableDTO();
             scoreTableDTO.setSemesterTranscripts(semesterTranscriptDTOS);
             double totalScore = 0;
-            double avgScore = 0;
+            double totalScoreFour = 0;
             int totalCredit = 0;
             int totalCreditPass = 0;
             for (Map.Entry<Integer, List<CourseRegistrationResult>> en : map.entrySet()) {
@@ -76,10 +73,13 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 double avgScoreSub = 0;
                 int totalCreditSub = 0;
                 int totalCreditPassSub = 0;
+                int totalScoreFourSub = 0;
+
 
                 for (CourseRegistrationResult c : courses) {
                     totalScoreSub += c.getNumberScoreTen() * c.getCourse().getSubject().getCredit();
                     totalCreditSub += c.getCourse().getSubject().getCredit();
+                    totalScoreFourSub += c.getNumberScoreFour() * c.getCourse().getSubject().getCredit();
                     SubjectScoreDTO subjectScoreDTO = new SubjectScoreDTO();
                     if (c.getNumberScoreTen() >= 4) {
                         totalCreditPassSub += c.getCourse().getSubject().getCredit();
@@ -93,7 +93,7 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 }
                 avgScoreSub = Math.floor(((double) totalScoreSub / totalCreditSub) * 100) / 100;
                 semesterTranscriptDTO.setAvgScoreTen(avgScoreSub);
-                semesterTranscriptDTO.setAvgScoreFour(Math.floor((avgScoreSub / 10) * 4 * 100) / 100);
+                semesterTranscriptDTO.setAvgScoreFour(Math.floor(((double)totalScoreFourSub / totalCreditSub) * 100) / 100);
                 semesterTranscriptDTO.setTotalCredit(totalCreditPassSub);
                 semesterTranscriptDTOS.add(semesterTranscriptDTO);
 
@@ -101,13 +101,16 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 totalScore += totalScoreSub;
                 totalCredit += totalCreditSub;
                 totalCreditPass += totalCreditPassSub;
+                totalScoreFour += semesterTranscriptDTO.getAvgScoreFour();
+
+                // end 1 học kì
             }
 
             scoreTableDTO.setAvgScoreTen(Math.floor(((double) totalScore / totalCredit) * 100) / 100);
-            scoreTableDTO.setAvgScoreFour(Math.floor(((double) totalScore / totalCredit) / 10 * 4 * 100) / 100);
+            scoreTableDTO.setAvgScoreFour(Math.floor(((double) totalScoreFour / scoreTableDTO.getSemesterTranscripts().size()) * 100) / 100);
             scoreTableDTO.setTotalCredit(totalCreditPass);
             return scoreTableDTO;
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;
@@ -117,16 +120,12 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
     @Override
     public Workbook exportTimeTable(Long userId, int semester, int year) {
         // lấy ds học phần đăng kí
-        List<CourseRegistrationResult> courseRegistrationResults =
-                getCourseRegistrationResultByStudentIdAndYearAndSemester(userId, year, semester);
-        List<CourseRegistrationResultDTO> courseRegistrationResultDTOS =
-                courseRegistrationResults
-                        .stream()
-                        .map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e))
-                        .collect(Collectors.toList());
-        courseRegistrationResultDTOS.stream().forEach(e->{
-            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractice() != null &&
-                    item.getId() != e.getCourseTimePractice().getId() &&
+        List<CourseRegistrationResult> courseRegistrationResults = getCourseRegistrationResultByStudentIdAndYearAndSemester(userId, year, semester);
+        List<CourseRegistrationResultDTO> courseRegistrationResultDTOS = courseRegistrationResults.stream().map(e -> CourseRegistrationResultConverter.toCourseRegistrationResultDTO(e)).collect(Collectors.toList());
+        courseRegistrationResultDTOS.stream().forEach(e -> {
+            List<String> courseTimePractices = Arrays.stream(e.getCourseTimePractices().split(",")).collect(Collectors.toList());
+            e.getCourse().getCourseTimes().removeIf(item -> e.getCourseTimePractices() != null &&
+                    !courseTimePractices.contains(item.getId() + "") &&
                     item.getType().equals("TH"));
         });
         // create excel file
@@ -136,6 +135,92 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
         buildData(workbook, sheet, courseRegistrationResultDTOS);
         return workbook;
     }
+
+    @Override
+    public Workbook exportScoreTable(Long userId) {
+        // lấy bảng điểm
+        ScoreTableDTO scoreTableDTO = getScoreTableByStudent(userId);
+
+        // create excel file
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("thoi-khoa-bieu");
+        buildHeaderScoreTable(workbook, sheet);
+        buildDataScoreTable(workbook, sheet, scoreTableDTO);
+
+        return workbook;
+    }
+
+    private void buildHeaderScoreTable(XSSFWorkbook workbook, Sheet sheet) {
+        Row row = sheet.createRow(0);
+        XSSFCellStyle style = workbook.createCellStyle();
+//        style.setFillForegroundColor(new XSSFColor(new Color(72, 206, 58)));
+        style.setAlignment(HorizontalAlignment.CENTER);
+        Cell cell = row.createCell(0);
+        cell.setCellStyle(style);
+        cell.setCellValue("STT");
+
+        cell = row.createCell(1);
+        cell.setCellStyle(style);
+        cell.setCellValue("Mã MH");
+
+        cell = row.createCell(2);
+        cell.setCellStyle(style);
+        cell.setCellValue("Tên MH");
+
+        cell = row.createCell(3);
+        cell.setCellStyle(style);
+        cell.setCellValue("TC");
+
+        cell = row.createCell(4);
+        cell.setCellStyle(style);
+        cell.setCellValue("Điểm hệ 10");
+
+        cell = row.createCell(5);
+        cell.setCellStyle(style);
+        cell.setCellValue("Điểm hệ 4");
+
+        cell = row.createCell(6);
+        cell.setCellStyle(style);
+        cell.setCellValue("Điểm chữ");
+
+        cell = row.createCell(7);
+        cell.setCellStyle(style);
+        cell.setCellValue("Kết quả");
+    }
+
+    private void buildDataScoreTable(XSSFWorkbook workbook, Sheet sheet, ScoreTableDTO scoreTableDTO) {
+
+        XSSFFont font = workbook.createFont();
+        font.setFontName("Calibri");
+        font.setFontHeightInPoints((short) 11);
+
+        CellStyle style = workbook.createCellStyle();
+        style.setFont(font);
+        style.setWrapText(false);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
+
+        int rowIndex = 1;
+        for (SemesterTranscriptDTO st : scoreTableDTO.getSemesterTranscripts()) {
+            Row row = sheet.createRow(rowIndex++);
+            createCell(row, 0, "Học kì" + st.getSemester().getSemesterName() + " năm " + st.getSemester().getAcademyYear(), style);
+            int beginRow = 1;
+            for (SubjectScoreDTO ss : st.getSubjects()) {
+                row = sheet.createRow(rowIndex);
+                createCell(row, 0, beginRow, style);
+                createCell(row, 1, ss.getSubject().getId(), style);
+                createCell(row, 2, ss.getSubject().getName(), style);
+                createCell(row, 3, ss.getSubject().getCredit(), style);
+                createCell(row, 4, ss.getNumberScoreTen(), style);
+                createCell(row, 5, ss.getNumberScoreFour(), style);
+                createCell(row, 6, ss.getLiteralScore(), style);
+                createCell(row, 7, ss.isPass() + "", style);
+                beginRow++;
+                rowIndex++;
+            }
+            rowIndex++;
+        }
+    }
+
     private void buildData(XSSFWorkbook workbook, Sheet sheet, List<CourseRegistrationResultDTO> courseRegistrationResultDTOS) {
 
         XSSFFont font = workbook.createFont();
@@ -149,7 +234,7 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
 
         int rowIndex = 1;
         for (CourseRegistrationResultDTO c : courseRegistrationResultDTOS) {
-            for(CourseTime courseTime: c.getCourse().getCourseTimes()){
+            for (CourseTime courseTime : c.getCourse().getCourseTimes()) {
                 int beginRow = rowIndex;
                 Row row = sheet.createRow(rowIndex);
                 createCell(row, 0, beginRow, style);
@@ -161,23 +246,26 @@ public class CourseRegistrationResultService extends ABaseServices implements IC
                 createCell(row, 6, courseTime.getTimeStart(), style);
                 createCell(row, 7, c.getCourse().getSubject().getLessonTime(), style);
                 createCell(row, 8, courseTime.getClassroom().getName(), style);
-                createCell(row, 9, DateUtils.dateToString(courseTime.getDateStart())+
-                        "-"+DateUtils.dateToString(courseTime.getDateEnd()), style);
+                createCell(row, 9, DateUtils.dateToString(courseTime.getDateStart()) + "-" + DateUtils.dateToString(courseTime.getDateEnd()), style);
                 rowIndex++;
             }
         }
     }
+
     private void createCell(Row row, int column, Object data, CellStyle style) {
         Cell cell = row.createCell(column);
         cell.setCellStyle(style);
         if (data instanceof String) {
             cell.setCellValue((String) data);
+        } else if (data instanceof Double) {
+            cell.setCellValue((Double) data);
         } else if (data instanceof BigDecimal) {
             cell.setCellValue(((BigDecimal) data).longValue());
         } else if (data instanceof Integer) {
             cell.setCellValue((Integer) data);
         }
     }
+
     private void buildHeader(XSSFWorkbook workbook, Sheet sheet) {
         Row row = sheet.createRow(0);
 

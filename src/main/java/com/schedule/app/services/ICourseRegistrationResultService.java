@@ -20,4 +20,6 @@ public interface ICourseRegistrationResultService {
     ScoreTableDTO getScoreTableByStudent(Long userId);
 
     Workbook exportTimeTable(Long userId, int semester, int year);
+
+    Workbook exportScoreTable(Long userId);
 }
