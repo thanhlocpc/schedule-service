@@ -2,7 +2,9 @@ package com.schedule.app.entities;
 
 //import com.schedule.app.models.enums.ExamType;
 import com.schedule.app.models.enums.EnumsConst;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -10,6 +12,8 @@ import javax.validation.constraints.NotNull;
 @Entity
 @Table(name = "subject")
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class Subject {
 
     @Id
