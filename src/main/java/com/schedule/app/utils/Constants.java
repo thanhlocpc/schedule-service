@@ -20,6 +20,8 @@ public class Constants {
 
     public static final String SUBJECT_SERVICE_URL = API_VERSION + "/subjects";
 
+    public static final String SCORE_TABLE_SERVICE_URL = API_VERSION + "/score-table";
+
     public static final String GRADE_SERVICE_URL = API_VERSION + "/grades";
 
     public static final String CLASS_ROOM_SERVICE_URL = API_VERSION + "/class-room";

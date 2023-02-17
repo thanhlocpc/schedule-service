@@ -51,9 +51,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>com.schedule</groupId>
+            <groupId>schedule</groupId>
             <artifactId>scheduleExam</artifactId>
-            <version>1.0</version>
+            <version>1</version>
         </dependency>
 
         <!--		new-->

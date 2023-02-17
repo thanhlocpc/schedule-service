@@ -73,27 +73,7 @@ public class CourseRegistrationResultController extends BaseAPI {
     }
 
 
-    @GetMapping("/mark")
-    public ResponseEntity getMark(@RequestHeader("Access-Token") String accessToken) {
-        try {
-            // lấy theo token
-            String token = "";
-            if (accessToken != null && accessToken.length() > 6) {
-                token = accessToken.substring(6);
-            }
-            UserPrincipal userPrincipal = jwtUtil.getUserFromToken(token);
-            if (userPrincipal == null) {
-                throw new ScheduleServiceException("Không tìm thấy user này.");
-            }
-            // lấy bảng điểm
-            ScoreTableDTO scoreTableDTO = courseRegistrationResultService.getScoreTableByStudent(userPrincipal.getUserId());
-            return ResponseEntity.ok(scoreTableDTO);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
-        return ResponseEntity.ok(Collections.EMPTY_LIST);
-    }
 
     @GetMapping("/export-timetable")
     public ResponseEntity exportExcelTimeTableStudent(@RequestParam("year") int year,
@@ -125,31 +105,5 @@ public class CourseRegistrationResultController extends BaseAPI {
         return ResponseEntity.ok(Collections.EMPTY_LIST);
     }
 
-    @GetMapping("/export-score-table")
-    public ResponseEntity exportExcelScoreTableStudent(@RequestHeader("Access-Token") String accessToken) {
-        try {
-            // lấy theo token
-            String token = "";
-            if (accessToken != null && accessToken.length() > 6) {
-                token = accessToken.substring(6);
-            }
-            UserPrincipal userPrincipal = jwtUtil.getUserFromToken(token);
-            if (userPrincipal == null) {
-                throw new ScheduleServiceException("Không tìm thấy user này.");
-            }
 
-            Workbook workbook = courseRegistrationResultService.exportScoreTable(userPrincipal.getUserId());
-            String fileName = "lich-thi" + ".xlsx";
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            workbook.write(outputStream);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header("content-disposition", "attachment;filename=" + fileName)
-                    .body(outputStream.toByteArray());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return ResponseEntity.ok(Collections.EMPTY_LIST);
-    }
 }
