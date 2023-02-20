@@ -8,6 +8,7 @@ import com.schedule.app.models.dtos.score.SubjectScoreDTO;
 import com.schedule.app.services.ABaseServices;
 import com.schedule.app.services.IScoreTableService;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -80,7 +81,7 @@ public class ScoreTableService extends ABaseServices implements IScoreTableServi
                 }
                 avgScoreSub = Math.floor(((double) totalScoreSub / totalCreditSub) * 100) / 100;
                 semesterTranscriptDTO.setAvgScoreTen(avgScoreSub);
-                semesterTranscriptDTO.setAvgScoreFour(Math.floor(((double)totalScoreFourSub / totalCreditSub) * 100) / 100);
+                semesterTranscriptDTO.setAvgScoreFour(Math.floor(((double) totalScoreFourSub / totalCreditSub) * 100) / 100);
                 semesterTranscriptDTO.setTotalCredit(totalCreditPassSub);
                 semesterTranscriptDTOS.add(semesterTranscriptDTO);
 
@@ -169,7 +170,8 @@ public class ScoreTableService extends ABaseServices implements IScoreTableServi
         int rowIndex = 1;
         for (SemesterTranscriptDTO st : scoreTableDTO.getSemesterTranscripts()) {
             Row row = sheet.createRow(rowIndex++);
-            createCell(row, 0, "Học kì" + st.getSemester().getSemesterName() + " năm " + st.getSemester().getAcademyYear(), style);
+            sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, 7));
+            createCell(row, 0, "Học kì " + st.getSemester().getSemesterName() + " năm " + st.getSemester().getAcademyYear(), style);
             int beginRow = 1;
             for (SubjectScoreDTO ss : st.getSubjects()) {
                 row = sheet.createRow(rowIndex);
@@ -180,12 +182,26 @@ public class ScoreTableService extends ABaseServices implements IScoreTableServi
                 createCell(row, 4, ss.getNumberScoreTen(), style);
                 createCell(row, 5, ss.getNumberScoreFour(), style);
                 createCell(row, 6, ss.getLiteralScore(), style);
-                createCell(row, 7, ss.isPass() + "", style);
+                createCell(row, 7, ss.isPass() ? "Đạt" : "Trượt", style);
                 beginRow++;
                 rowIndex++;
             }
             rowIndex++;
         }
+        // build điểm trung bình
+        rowIndex++;
+        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, 7));
+        style.setAlignment(HorizontalAlignment.RIGHT);
+        Row row = sheet.createRow(rowIndex++);
+        createCell(row, 0, "Tín chỉ tích lũy: " + scoreTableDTO.getTotalCredit(), style);
+
+        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, 7));
+        row = sheet.createRow(rowIndex++);
+        createCell(row, 0, "Điểm trung bình hệ 10: " + scoreTableDTO.getAvgScoreTen(), style);
+
+        sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, 7));
+        row = sheet.createRow(rowIndex++);
+        createCell(row, 0, "Điểm trung bình hệ 4: " + scoreTableDTO.getAvgScoreFour(), style);
     }
 
     private void createCell(Row row, int column, Object data, CellStyle style) {
