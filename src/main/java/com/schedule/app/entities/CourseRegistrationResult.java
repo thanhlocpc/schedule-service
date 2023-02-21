@@ -25,13 +25,5 @@ public class CourseRegistrationResult extends BaseEntity{
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
-    private Double numberScoreFour;
-
-    private Double numberScoreTen;
-
-    private String literalScore;
-
-    private Boolean isPass;
-
     private Date createdAt;
 }
