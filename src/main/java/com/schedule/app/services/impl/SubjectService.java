@@ -7,8 +7,8 @@ import com.schedule.app.models.enums.EnumsConst;
 import com.schedule.app.repository.IScheduleFileRepository;
 import com.schedule.app.repository.ISubjectRepository;
 import com.schedule.app.services.ISubjectService;
-import models.DateSchedule;
-import models.Schedule;
+import com.schedule.initialization.models.DateSchedule;
+import com.schedule.initialization.models.Schedule;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

@@ -3,8 +3,8 @@ package com.schedule.app.services;
 import com.schedule.app.entities.ScheduleFile;
 import com.schedule.app.models.dtos.schedule_file.ScheduleFileDTO;
 import com.schedule.app.models.enums.FileStatus;
-import models.ChangeScheduleRequest;
-import models.Schedule;
+import com.schedule.initialization.models.ChangeScheduleRequest;
+import com.schedule.initialization.models.Schedule;
 import org.apache.poi.ss.usermodel.Workbook;
 
 import java.io.IOException;
