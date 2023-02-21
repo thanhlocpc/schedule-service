@@ -51,6 +51,11 @@
             <scope>test</scope>
         </dependency>
 
+        <dependency>
+            <groupId>com.schedule.initialization</groupId>
+            <artifactId>initialization</artifactId>
+            <version>1</version>
+        </dependency>
 
         <!--		new-->
 

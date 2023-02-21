@@ -17,9 +17,6 @@ public interface ICourseRegistrationResultService {
                                                                                                    int semester);
     public List<CourseRegistrationResult> findCourseRegistrationResultByStudent(Long studentId);
 
-    ScoreTableDTO getScoreTableByStudent(Long userId);
-
     Workbook exportTimeTable(Long userId, int semester, int year);
 
-    Workbook exportScoreTable(Long userId);
 }

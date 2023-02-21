@@ -14,10 +14,10 @@ import com.schedule.app.services.ISubjectScheduleService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
 import lombok.experimental.ExtensionMethod;
-import models.ChangeScheduleRequest;
-import models.DateSchedule;
-import models.Schedule;
-import models.SubjectSchedule;
+import com.schedule.initialization.models.ChangeScheduleRequest;
+import com.schedule.initialization.models.DateSchedule;
+import com.schedule.initialization.models.Schedule;
+import com.schedule.initialization.models.SubjectSchedule;
 import org.apache.poi.ss.usermodel.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +36,7 @@ import java.util.stream.Stream;
 
 @ExtensionMethod(Extensions.class)
 @RestController
-@RequestMapping(Constants.  SUBJECT_SCHEDULE_SERVICE_URL)
+@RequestMapping(Constants.SUBJECT_SCHEDULE_SERVICE_URL)
 public class SubjectScheduleController extends BaseAPI {
     @Autowired
     ISubjectScheduleService subjectScheduleService;
@@ -58,9 +58,10 @@ public class SubjectScheduleController extends BaseAPI {
         subjectScheduleService.setDefaultSubjectSchedule(fileName);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("/using/{academyYear}")
     public List<SubjectScheduleDTO> getSubjectSchedulesByAcademyYear(@PathVariable(name = "academyYear") Integer year) {
-        List<com.schedule.app.entities.SubjectSchedule> subjectSchedules=  subjectScheduleService.getSubjectSchedulesByAcademyYear(year);
+        List<com.schedule.app.entities.SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedulesByAcademyYear(year);
 //        List<SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedules();
         ModelMapper modelMapper = new ModelMapper();
         modelMapper.typeMap(com.schedule.app.entities.SubjectSchedule.class, SubjectScheduleDTO.class)
@@ -73,14 +74,15 @@ public class SubjectScheduleController extends BaseAPI {
                     mapper.map(src -> src.getCourse().getSemester().getAcademyYear(), SubjectScheduleDTO::setAcademyYear);
                 });
         List<SubjectScheduleDTO> subjectScheduleDTO = subjectSchedules
-                .stream()
+                .stream().filter(item->item.getCandidateAmount()>0)
                 .map(subjectSchedule -> modelMapper.map(subjectSchedule, SubjectScheduleDTO.class))
                 .collect(Collectors.toList());
         return subjectScheduleDTO;
     }
+
     @GetMapping("/{fileName}")
-    public List<SubjectScheduleDTO> getSubjectSchedules(@PathVariable("fileName")String fileName) throws IOException, ClassNotFoundException {
-        System.out.println("controller "+fileName);
+    public List<SubjectScheduleDTO> getSubjectSchedules(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
+        System.out.println("controller " + fileName);
         ScheduleFile scheduleFile = scheduleFileService.getScheduleFileByFileName(fileName);
         ByteArrayInputStream bis = new ByteArrayInputStream(scheduleFile.getFile());
         ObjectInputStream ois = new ObjectInputStream(bis);
@@ -105,10 +107,12 @@ public class SubjectScheduleController extends BaseAPI {
         dateScheduleList.forEach(item -> {
             item.getSubjectSchedules().forEach(ss ->
             {
-                SubjectScheduleDTO ssDto = modelMapper.map(ss, SubjectScheduleDTO.class);
-                ssDto.setDateExam(LocalDate.parse(item.getDate()));
-                ssDto.setExamType(types.get(ss.getSubject().getExamForms()));
-                subjectScheduleDTOs.add(ssDto);
+                if (ss.getRoom().getCapacity() > 0) {
+                    SubjectScheduleDTO ssDto = modelMapper.map(ss, SubjectScheduleDTO.class);
+                    ssDto.setDateExam(LocalDate.parse(item.getDate()));
+                    ssDto.setExamType(types.get(ss.getSubject().getExamForms()));
+                    subjectScheduleDTOs.add(ssDto);
+                }
             });
         });
         System.out.println("========schedule actual");

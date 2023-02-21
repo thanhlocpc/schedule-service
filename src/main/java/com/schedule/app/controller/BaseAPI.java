@@ -3,10 +3,7 @@ package com.schedule.app.controller;
 import com.google.gson.Gson;
 import com.schedule.app.repository.IOtpRepository;
 import com.schedule.app.repository.ISubjectScheduleResultRepository;
-import com.schedule.app.services.ICourseRegistrationResultService;
-import com.schedule.app.services.ISubjectScheduleService;
-import com.schedule.app.services.IUserLoginService;
-import com.schedule.app.services.IUserService;
+import com.schedule.app.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.logging.Logger;
@@ -43,6 +40,9 @@ public abstract class BaseAPI {
 
     @Autowired
     protected ICourseRegistrationResultService courseRegistrationResultService;
+
+    @Autowired
+    protected IScoreTableService scoreTableService;
 
 
     //repository
