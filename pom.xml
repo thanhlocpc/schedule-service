@@ -50,11 +50,12 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>schedule</groupId>-->
-<!--            <artifactId>scheduleExam</artifactId>-->
-<!--            <version>1</version>-->
-<!--        </dependency>-->
+
+        <dependency>
+            <groupId>com.schedule.initialization</groupId>
+            <artifactId>initialization</artifactId>
+            <version>1</version>
+        </dependency>
 
         <!--		new-->
 
