@@ -1,10 +1,12 @@
 package com.schedule.app.controller;
 
+import com.schedule.app.entities.ScheduleFile;
 import com.schedule.app.models.dtos.subject.SubjectDTO;
 import com.schedule.app.services.IScheduleFileService;
 import com.schedule.app.services.ISubjectService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
+import gwo.GWO;
 import lombok.experimental.ExtensionMethod;
 import models.Schedule;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -41,13 +43,27 @@ public class SubjectController {
     @PostMapping("/newSchedule")
     public ResponseEntity generateNewSchedule() throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
        Schedule schedule= scheduleFileService.generateNewSchedule();
+
+        return ResponseEntity.ok()
+                .build();
+    }
+    @GetMapping("/export-schedule/{fileName}")
+    public ResponseEntity exportSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
+
+        Schedule schedule=null;
+        GWO gwo=new GWO();
+        if(fileName.equals("current")){
+            schedule=gwo.convertByteToSchedule(scheduleFileService.getUsedScheduleFile().getFile());
+        }else{
+            schedule=gwo.convertByteToSchedule(scheduleFileService.getScheduleFileByFileName(fileName).getFile());
+        }
         Workbook workbook = scheduleFileService.exportSchedule(1L, 1,2020,schedule);
-        String fileName = "lich-thi" + ".xlsx";
+        String fileExport = "lich-thi" + ".xlsx";
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         workbook.write(outputStream);
         return ResponseEntity.ok()
                 .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .header("content-disposition", "attachment;filename=" + fileName)
+                .header("content-disposition", "attachment;filename=" + fileExport)
                 .body(outputStream.toByteArray());
     }
 }

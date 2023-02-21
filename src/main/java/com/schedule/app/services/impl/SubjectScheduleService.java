@@ -64,7 +64,7 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
         Semester semester=scheduleFile.getSemester();
 
         subjectScheduleResultRepository.deleteSubjectScheduleResultBySemester(semester);
-        courseRegistrationResultRepository.deleteCourseRegistrationResultBySemester(semester);
+//        courseRegistrationResultRepository.deleteCourseRegistrationResultBySemester(semester);
         subjectScheduleRepository.deleteSubjectScheduleBySemester(semester);
 
         ByteArrayInputStream bis = new ByteArrayInputStream(scheduleFile.getFile());
@@ -74,13 +74,13 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
 
         List<SubjectSchedule> subjectSchedules=new ArrayList<>();
                 for(DateSchedule ds:schedule.getDateScheduleList()){
-                    subjectSchedules.addAll( ds.getSubjectSchedules().stream().map(ss->{
+                    subjectSchedules.addAll( ds.getSubjectSchedules().stream().filter(item->item.getRoom().getCapacity()>0).map(ss->{
                         Subject subject=new Subject();
                         subject.setId(ss.getSubject().getId());
                         Classroom classroom=new Classroom();
                         classroom.setId(Long.parseLong(ss.getRoom().getRoom().getId()));
                         Course course=new Course();
-                        course.setId(Long.parseLong(ss.getRoom().getRegistrationClass().getId()));
+                        course.setId((long) ss.getRoom().getRegistrationClass().getDbId());
                         return new SubjectSchedule(subject,classroom,course,ss.getShift(), LocalDate.parse(ds.getDate()),ss.getRoom().getIndex(),ss.getRoom().getCapacity());
                     }).collect(Collectors.toList()));
                 }
