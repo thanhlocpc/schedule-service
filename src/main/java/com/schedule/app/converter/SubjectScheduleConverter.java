@@ -22,11 +22,11 @@ public class SubjectScheduleConverter {
         subjectScheduleDTO.setSubjectScheduleIndex(subjectScheduleDTO.getSubjectScheduleIndex());
         subjectScheduleDTO.setLessonEnd(subjectSchedule.getSubject().getExamTime());
         subjectScheduleDTO.setAcademyYear(subjectSchedule.getCourse().getSemester().getAcademyYear());
-        if (subjectSchedule.getShift() == 1) {
+        if (subjectSchedule.getShift() == 0) {
             subjectScheduleDTO.setLessonStart(1);
-        } else if (subjectSchedule.getShift() == 2) {
+        } else if (subjectSchedule.getShift() == 1) {
             subjectScheduleDTO.setLessonStart(4);
-        } else if (subjectSchedule.getShift() == 3) {
+        } else if (subjectSchedule.getShift() == 2) {
             subjectScheduleDTO.setLessonStart(7);
         } else {
             subjectScheduleDTO.setLessonStart(10);

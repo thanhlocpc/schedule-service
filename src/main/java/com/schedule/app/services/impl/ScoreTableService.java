@@ -169,10 +169,11 @@ public class ScoreTableService extends ABaseServices implements IScoreTableServi
 
         int rowIndex = 1;
         for (SemesterTranscriptDTO st : scoreTableDTO.getSemesterTranscripts()) {
-            Row row = sheet.createRow(rowIndex++);
+            Row row = sheet.createRow(rowIndex);
             sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, 7));
             createCell(row, 0, "Học kì " + st.getSemester().getSemesterName() + " năm " + st.getSemester().getAcademyYear(), style);
             int beginRow = 1;
+            rowIndex++;
             for (SubjectScoreDTO ss : st.getSubjects()) {
                 row = sheet.createRow(rowIndex);
                 createCell(row, 0, beginRow, style);
@@ -191,17 +192,21 @@ public class ScoreTableService extends ABaseServices implements IScoreTableServi
         // build điểm trung bình
         rowIndex++;
         sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, 7));
-        style.setAlignment(HorizontalAlignment.RIGHT);
+        CellStyle style2 = workbook.createCellStyle();
+        style2.cloneStyleFrom(style);
+        style2.setAlignment(HorizontalAlignment.RIGHT);
+
+
         Row row = sheet.createRow(rowIndex++);
-        createCell(row, 0, "Tín chỉ tích lũy: " + scoreTableDTO.getTotalCredit(), style);
+        createCell(row, 0, "Tín chỉ tích lũy: " + scoreTableDTO.getTotalCredit(), style2);
 
         sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, 7));
         row = sheet.createRow(rowIndex++);
-        createCell(row, 0, "Điểm trung bình hệ 10: " + scoreTableDTO.getAvgScoreTen(), style);
+        createCell(row, 0, "Điểm trung bình hệ 10: " + scoreTableDTO.getAvgScoreTen(), style2);
 
         sheet.addMergedRegion(new CellRangeAddress(rowIndex, rowIndex, 0, 7));
         row = sheet.createRow(rowIndex++);
-        createCell(row, 0, "Điểm trung bình hệ 4: " + scoreTableDTO.getAvgScoreFour(), style);
+        createCell(row, 0, "Điểm trung bình hệ 4: " + scoreTableDTO.getAvgScoreFour(), style2);
     }
 
     private void createCell(Row row, int column, Object data, CellStyle style) {

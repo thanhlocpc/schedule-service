@@ -3,6 +3,7 @@ package com.schedule.app.entities;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.util.Date;
 
 /**
  * @author ThanhLoc
@@ -28,4 +29,6 @@ public class ScoreTable extends BaseEntity{
     private String literalScore;
 
     private Boolean isPass;
+
+    private Date createdAt;
 }
