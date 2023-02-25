@@ -55,13 +55,14 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
     public List<SubjectSchedule> getSubjectSchedules() {
         return subjectScheduleRepository.findAll();
     }
+
     @Override
     @Transactional
     public void setDefaultSubjectSchedule(String fileName) throws IOException, ClassNotFoundException {
-        ScheduleFile scheduleFile=scheduleFileRepository.getScheduleFileByName(fileName);
+        ScheduleFile scheduleFile = scheduleFileRepository.getScheduleFileByName(fileName);
 
         System.out.println(scheduleFile.getSemester().getId());
-        Semester semester=scheduleFile.getSemester();
+        Semester semester = scheduleFile.getSemester();
 
         subjectScheduleResultRepository.deleteSubjectScheduleResultBySemester(semester);
 //        courseRegistrationResultRepository.deleteCourseRegistrationResultBySemester(semester);
@@ -72,23 +73,25 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
         Schedule schedule = (Schedule) ois.readObject();
         ois.close();
 
-        List<SubjectSchedule> subjectSchedules=new ArrayList<>();
-                for(DateSchedule ds:schedule.getDateScheduleList()){
-                    subjectSchedules.addAll( ds.getSubjectSchedules().stream().filter(item->item.getRoom().getCapacity()>0).map(ss->{
-                        Subject subject=new Subject();
-                        subject.setId(ss.getSubject().getId());
-                        Classroom classroom=new Classroom();
-                        classroom.setId(Long.parseLong(ss.getRoom().getRoom().getId()));
-                        Course course=new Course();
-                        course.setId((long) ss.getRoom().getRegistrationClass().getDbId());
-                        return new SubjectSchedule(subject,classroom,course,ss.getShift(), LocalDate.parse(ds.getDate()),ss.getRoom().getIndex(),ss.getRoom().getCapacity());
-                    }).collect(Collectors.toList()));
-                }
+        List<SubjectSchedule> subjectSchedules = new ArrayList<>();
+        for (DateSchedule ds : schedule.getDateScheduleList()) {
+            subjectSchedules.addAll(ds.getSubjectSchedules().stream().filter(item -> item.getRoom().getCapacity() > 0).map(ss -> {
+                Subject subject = new Subject();
+                subject.setId(ss.getSubject().getId());
+                Classroom classroom = new Classroom();
+                classroom.setId(Long.parseLong(ss.getRoom().getRoom().getId()));
+                Course course = new Course();
+                course.setId((long) ss.getRoom().getRegistrationClass().getDbId());
+                return new SubjectSchedule(subject, classroom, course, ss.getShift(), LocalDate.parse(ds.getDate()), ss.getRoom().getIndex(), ss.getRoom().getCapacity());
+            }).collect(Collectors.toList()));
+        }
         subjectScheduleRepository.saveAll(subjectSchedules);
-        scheduleFileService.setFileUsedToStatus(FileStatus.DELETE);
+        if (scheduleFileService.getUsedScheduleFile() != null)
+            scheduleFileService.setFileUsedToStatus(FileStatus.DELETE);
         scheduleFile.setFileStatus(FileStatus.USED);
         scheduleFileRepository.save(scheduleFile);
     }
+
     @Override
     public Workbook exportSchedule(Long uid, int semester, int year) {
         // lấy ds lịch thi
@@ -134,6 +137,7 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
             rowIndex++;
         }
     }
+
     private void createCell(Row row, int column, Object data, CellStyle style) {
         Cell cell = row.createCell(column);
         cell.setCellStyle(style);
@@ -145,6 +149,7 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
             cell.setCellValue((Integer) data);
         }
     }
+
     private void buildHeader(XSSFWorkbook workbook, Sheet sheet) {
         Row row = sheet.createRow(0);
 
