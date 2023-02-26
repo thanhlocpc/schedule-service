@@ -48,6 +48,8 @@ public class SubjectScheduleController extends BaseAPI {
 
     @Autowired
     IScheduleFileService scheduleFileService;
+    @Autowired
+    private ISubjectScheduleRepository iSubjectScheduleRepository;
 
     @PostMapping("/change")
     public ResponseEntity changeSchedule(@RequestBody List<ChangeScheduleRequest> changeSchedules) throws IOException, ClassNotFoundException, CloneNotSupportedException {
@@ -133,17 +135,24 @@ public class SubjectScheduleController extends BaseAPI {
     @PostMapping("/schedule-excel")
     @Operation(summary = "Tạo lịch thi bằng excel")
     public ResponseEntity createScheduleByExcel(@RequestParam("file") MultipartFile file) throws IOException {
-        // code tạo lịch thi bằng excel ở đây
-        InputStream inputStream = file.getInputStream();
-        // đọc nội dung file excel
-        Workbook workbook = new XSSFWorkbook(inputStream);
 
-        // dùng lại code tạo lịch thi
-//        GWO gwo = new GWO();
-//        gwo.setData(workbook);
-//        gwo.gwo();
-//        // lưu lại lịch thi
-//        gwo.finalSchedule;
+        try {
+            // code tạo lịch thi bằng excel ở đây
+            InputStream inputStream = file.getInputStream();
+            // đọc nội dung file excel
+            Workbook workbook = new XSSFWorkbook(inputStream);
+
+            // dùng lại code tạo lịch thi
+            GWO gwo = new GWO();
+            gwo.setData(workbook);
+            gwo.initData();
+            gwo.gwo();
+            // lưu lại lịch thi
+            Schedule schedule = gwo.finalSchedule; 
+        }catch (Exception e){
+
+        }
+
 
         return ResponseEntity.ok("Tạo lịch thi thành công.");
     }
