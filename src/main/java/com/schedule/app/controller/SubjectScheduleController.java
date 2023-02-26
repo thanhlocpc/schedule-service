@@ -13,17 +13,22 @@ import com.schedule.app.services.IScheduleFileService;
 import com.schedule.app.services.ISubjectScheduleService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
+import com.schedule.initialization.gwo.GWO;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.experimental.ExtensionMethod;
 import com.schedule.initialization.models.ChangeScheduleRequest;
 import com.schedule.initialization.models.DateSchedule;
 import com.schedule.initialization.models.Schedule;
 import com.schedule.initialization.models.SubjectSchedule;
 import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Description;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.websocket.server.PathParam;
 import java.io.*;
@@ -123,6 +128,24 @@ public class SubjectScheduleController extends BaseAPI {
         }
 //        List<SubjectScheduleDTO> subjectScheduleDTO = subjectSchedules.stream().map(subjectSchedule -> modelMapper.map(subjectSchedule, SubjectScheduleDTO.class)).collect(Collectors.toList());
         return subjectScheduleDTOs;
+    }
+
+    @PostMapping("/schedule-excel")
+    @Operation(summary = "Tạo lịch thi bằng excel")
+    public ResponseEntity createScheduleByExcel(@RequestParam("file") MultipartFile file) throws IOException {
+        // code tạo lịch thi bằng excel ở đây
+        InputStream inputStream = file.getInputStream();
+        // đọc nội dung file excel
+        Workbook workbook = new XSSFWorkbook(inputStream);
+
+        // dùng lại code tạo lịch thi
+//        GWO gwo = new GWO();
+//        gwo.setData(workbook);
+//        gwo.gwo();
+//        // lưu lại lịch thi
+//        gwo.finalSchedule;
+
+        return ResponseEntity.ok("Tạo lịch thi thành công.");
     }
 
     @GetMapping("/student")
