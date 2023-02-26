@@ -148,7 +148,7 @@ public class SubjectScheduleController extends BaseAPI {
             gwo.initData();
             gwo.gwo();
             // lưu lại lịch thi
-            Schedule schedule = gwo.finalSchedule; 
+            Schedule schedule = gwo.finalSchedule;
         }catch (Exception e){
 
         }
