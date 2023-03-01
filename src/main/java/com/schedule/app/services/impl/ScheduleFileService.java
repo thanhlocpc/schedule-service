@@ -7,6 +7,7 @@ import com.schedule.app.models.enums.EnumsConst;
 import com.schedule.app.models.enums.FileStatus;
 import com.schedule.app.repository.IScheduleFileRepository;
 import com.schedule.app.services.IScheduleFileService;
+import com.schedule.initialization.data.InitData;
 import com.schedule.initialization.gwo.GWO;
 import com.schedule.initialization.models.ChangeScheduleRequest;
 import com.schedule.initialization.models.DateSchedule;
@@ -40,18 +41,9 @@ public class ScheduleFileService implements IScheduleFileService {
     }
 
     @Override
-    public Schedule generateNewSchedule() throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
-        List<String> dates = new ArrayList<>();
-        dates.add("2022-10-12");
-        dates.add("2022-10-13");
-        dates.add("2022-10-14");
-        dates.add("2022-10-15");
-        dates.add("2022-10-16");
-        dates.add("2022-10-17");
-        dates.add("2022-10-18");
-        dates.add("2022-10-19");
-        dates.add("2022-10-20");
-        GWO gwo = new GWO(dates);
+    public Schedule generateNewSchedule(List<Integer> properties) throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
+        List<String> dates = InitData.examDates;
+        GWO gwo = new GWO(dates,properties);
         byte[] scheduleByteArray = gwo.generateNewSchedule(1);
         Semester semester = new Semester(1, 2021);
         semester.setId(1L);

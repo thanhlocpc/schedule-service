@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface IScheduleFileService {
     void addScheduleFile(ScheduleFile scheduleFile);
-    Schedule generateNewSchedule() throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException;
+    Schedule generateNewSchedule(List<Integer> properties) throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException;
     ScheduleFile getUsedScheduleFile();
     ScheduleFile getScheduleFileByFileName(String fileName);
     List<ScheduleFileDTO> getAllScheduleFile();

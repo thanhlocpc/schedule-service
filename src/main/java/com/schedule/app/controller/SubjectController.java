@@ -2,6 +2,7 @@ package com.schedule.app.controller;
 
 import com.schedule.app.entities.ScheduleFile;
 import com.schedule.app.models.dtos.subject.SubjectDTO;
+import com.schedule.app.requests.GenerateScheduleRequest;
 import com.schedule.app.services.IScheduleFileService;
 import com.schedule.app.services.ISubjectService;
 import com.schedule.app.utils.Constants;
@@ -41,8 +42,10 @@ public class SubjectController {
         return ResponseEntity.ok().body(scheduleFileService.getAllScheduleFile());
     }
     @PostMapping("/newSchedule")
-    public ResponseEntity generateNewSchedule() throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
-       Schedule schedule= scheduleFileService.generateNewSchedule();
+    public ResponseEntity generateNewSchedule(@RequestBody GenerateScheduleRequest generateScheduleRequest) throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
+        System.out.println("properties");
+        generateScheduleRequest.getProperties().forEach(System.out::println);
+        Schedule schedule= scheduleFileService.generateNewSchedule(generateScheduleRequest.getProperties());
 
         return ResponseEntity.ok()
                 .build();
