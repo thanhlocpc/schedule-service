@@ -40,8 +40,14 @@ public class SubjectService implements ISubjectService {
         ois.close();
         List<SubjectDTO> result=new ArrayList<>();
         List<DateSchedule> dateScheduleList=schedule.getDateScheduleList();
+        String examType="";
         for (DateSchedule ds:dateScheduleList){
-            result.addAll( ds.getSubjectSchedules().stream().map(item->item.getSubject()).distinct().map(item->new SubjectDTO(new Subject(item.getId(),item.getName(), null,0,0,0), LocalDate.parse(ds.getDate()))).collect(Collectors.toList()));
+            for(int i=0;i<EnumsConst.ExamType.values().length;i++){
+
+            }
+            result.addAll( ds.getSubjectSchedules().stream()
+                    .map(item->item.getSubject()).distinct()
+                    .map(item->new SubjectDTO(new Subject(item.getId(),item.getName(), EnumsConst.ExamType.values()[item.getExamForms()],EnumsConst.ExamType.values()[item.getExamForms()].equals("ORAL")?12:item.getExamTime(),0,item.getCredit()), LocalDate.parse(ds.getDate()))).collect(Collectors.toList()));
         }
 //        return subjectRepository.getSubjectWithDate();
         return result;
