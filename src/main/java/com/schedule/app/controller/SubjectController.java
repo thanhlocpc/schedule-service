@@ -17,8 +17,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.websocket.server.PathParam;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.util.List;
 
 @ExtensionMethod(Extensions.class)
@@ -54,11 +56,19 @@ public class SubjectController {
     public ResponseEntity exportSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
 
         Schedule schedule=null;
+
+
         GWO gwo=new GWO();
         if(fileName.equals("current")){
-            schedule=gwo.convertByteToSchedule(scheduleFileService.getUsedScheduleFile().getFile());
+//            schedule=gwo.convertByteToSchedule();
+            ByteArrayInputStream bis=new ByteArrayInputStream(scheduleFileService.getUsedScheduleFile().getFile());
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            schedule=(Schedule) ois.readObject();
         }else{
-            schedule=gwo.convertByteToSchedule(scheduleFileService.getScheduleFileByFileName(fileName).getFile());
+            ByteArrayInputStream bis=new ByteArrayInputStream(scheduleFileService.getScheduleFileByFileName(fileName).getFile());
+            ObjectInputStream ois = new ObjectInputStream(bis);
+            schedule=(Schedule) ois.readObject();
+//            schedule=gwo.convertByteToSchedule(scheduleFileService.getScheduleFileByFileName(fileName).getFile());
         }
         Workbook workbook = scheduleFileService.exportSchedule(1L, 1,2020,schedule);
         String fileExport = "lich-thi" + ".xlsx";
