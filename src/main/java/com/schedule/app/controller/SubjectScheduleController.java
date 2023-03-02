@@ -79,6 +79,8 @@ public class SubjectScheduleController extends BaseAPI {
                     mapper.map(src -> src.getCourse().getSemester().getSemesterName(), SubjectScheduleDTO::setSemesterName);
                     mapper.map(src -> src.getCourse().getClassEntity().getName(), SubjectScheduleDTO::setClassName);
                     mapper.map(src -> src.getCourse().getSemester().getAcademyYear(), SubjectScheduleDTO::setAcademyYear);
+                    mapper.map(src->src.getCandidateAmount(),SubjectScheduleDTO::setCandidateAmount);
+                    mapper.map(src->src.getSubjectScheduleIndex(),SubjectScheduleDTO::setSubjectScheduleIndex);
                 });
         List<SubjectScheduleDTO> subjectScheduleDTO = subjectSchedules
                 .stream().filter(item->item.getCandidateAmount()>0)
