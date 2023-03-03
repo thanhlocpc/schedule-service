@@ -2,6 +2,7 @@ package com.schedule.app.controller;
 
 import com.schedule.app.entities.ScheduleFile;
 import com.schedule.app.models.dtos.subject.SubjectDTO;
+import com.schedule.app.models.wrapper.ObjectResponseWrapper;
 import com.schedule.app.requests.GenerateScheduleRequest;
 import com.schedule.app.services.IScheduleFileService;
 import com.schedule.app.services.ISubjectService;
@@ -44,12 +45,21 @@ public class SubjectController {
         return ResponseEntity.ok().body(scheduleFileService.getAllScheduleFile());
     }
     @PostMapping("/newSchedule")
-    public ResponseEntity generateNewSchedule(@RequestBody GenerateScheduleRequest generateScheduleRequest) throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
-        System.out.println("properties");
-        generateScheduleRequest.getProperties().forEach(System.out::println);
-        Schedule schedule= scheduleFileService.generateNewSchedule(generateScheduleRequest.getProperties());
-
-        return ResponseEntity.ok()
+    public ObjectResponseWrapper generateNewSchedule(@RequestBody GenerateScheduleRequest generateScheduleRequest) throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
+       try {
+           System.out.println("properties");
+           generateScheduleRequest.getProperties().forEach(System.out::println);
+           scheduleFileService.generateNewSchedule(generateScheduleRequest.getProperties());
+       }catch (Exception e){
+           e.printStackTrace();
+           return ObjectResponseWrapper.builder()
+                   .status(0)
+                   .message("Vui lòng thử lại.")
+                   .build();
+       }
+        return ObjectResponseWrapper.builder()
+                .status(1)
+                .message("Đã tạo một lịch thi mới")
                 .build();
     }
     @GetMapping("/export-schedule/{fileName}")

@@ -6,14 +6,18 @@ import com.schedule.app.entities.SubjectScheduleResult;
 import com.schedule.app.handler.ScheduleServiceException;
 import com.schedule.app.models.dtos.subject_schedule.SubjectScheduleDTO;
 import com.schedule.app.models.enums.EnumsConst;
+import com.schedule.app.models.wrapper.ObjectResponseWrapper;
 import com.schedule.app.repository.IScheduleFileRepository;
 import com.schedule.app.repository.ISubjectScheduleRepository;
+import com.schedule.app.requests.GenerateScheduleRequest;
 import com.schedule.app.security.UserPrincipal;
 import com.schedule.app.services.IScheduleFileService;
 import com.schedule.app.services.ISubjectScheduleService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
+import com.schedule.initialization.data.InitData;
 import com.schedule.initialization.gwo.GWO;
+import com.schedule.initialization.utils.ExcelFile;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.experimental.ExtensionMethod;
 import com.schedule.initialization.models.ChangeScheduleRequest;
@@ -22,6 +26,7 @@ import com.schedule.initialization.models.Schedule;
 import com.schedule.initialization.models.SubjectSchedule;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.xwpf.usermodel.IBody;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Description;
@@ -34,6 +39,7 @@ import javax.websocket.server.PathParam;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,10 +60,8 @@ public class SubjectScheduleController extends BaseAPI {
     @PostMapping("/change")
     public ResponseEntity changeSchedule(@RequestBody List<ChangeScheduleRequest> changeSchedules) throws IOException, ClassNotFoundException, CloneNotSupportedException {
         Schedule scheduleChange = scheduleFileService.changeSchedule(changeSchedules);
-        if (scheduleChange == null)
-            return ResponseEntity.badRequest().body(null);
-        else
-            return ResponseEntity.ok(scheduleChange);
+        if (scheduleChange == null) return ResponseEntity.badRequest().body(null);
+        else return ResponseEntity.ok(scheduleChange);
     }
 
     @PostMapping("/as-default/{fileName}")
@@ -71,21 +75,17 @@ public class SubjectScheduleController extends BaseAPI {
         List<com.schedule.app.entities.SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedulesByAcademyYear(year);
 //        List<SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedules();
         ModelMapper modelMapper = new ModelMapper();
-        modelMapper.typeMap(com.schedule.app.entities.SubjectSchedule.class, SubjectScheduleDTO.class)
-                .addMappings(mapper -> {
-                    mapper.map(src -> src.getSubject().getName(), SubjectScheduleDTO::setSubjectName);
-                    mapper.map(src -> src.getClassroom().getName(), SubjectScheduleDTO::setClassroomName);
-                    mapper.map(src -> src.getCourse().getName(), SubjectScheduleDTO::setCourseName);
-                    mapper.map(src -> src.getCourse().getSemester().getSemesterName(), SubjectScheduleDTO::setSemesterName);
-                    mapper.map(src -> src.getCourse().getClassEntity().getName(), SubjectScheduleDTO::setClassName);
-                    mapper.map(src -> src.getCourse().getSemester().getAcademyYear(), SubjectScheduleDTO::setAcademyYear);
-                    mapper.map(src->src.getCandidateAmount(),SubjectScheduleDTO::setCandidateAmount);
-                    mapper.map(src->src.getSubjectScheduleIndex(),SubjectScheduleDTO::setSubjectScheduleIndex);
-                });
-        List<SubjectScheduleDTO> subjectScheduleDTO = subjectSchedules
-                .stream().filter(item->item.getCandidateAmount()>0)
-                .map(subjectSchedule -> modelMapper.map(subjectSchedule, SubjectScheduleDTO.class))
-                .collect(Collectors.toList());
+        modelMapper.typeMap(com.schedule.app.entities.SubjectSchedule.class, SubjectScheduleDTO.class).addMappings(mapper -> {
+            mapper.map(src -> src.getSubject().getName(), SubjectScheduleDTO::setSubjectName);
+            mapper.map(src -> src.getClassroom().getName(), SubjectScheduleDTO::setClassroomName);
+            mapper.map(src -> src.getCourse().getName(), SubjectScheduleDTO::setCourseName);
+            mapper.map(src -> src.getCourse().getSemester().getSemesterName(), SubjectScheduleDTO::setSemesterName);
+            mapper.map(src -> src.getCourse().getClassEntity().getName(), SubjectScheduleDTO::setClassName);
+            mapper.map(src -> src.getCourse().getSemester().getAcademyYear(), SubjectScheduleDTO::setAcademyYear);
+            mapper.map(src -> src.getCandidateAmount(), SubjectScheduleDTO::setCandidateAmount);
+            mapper.map(src -> src.getSubjectScheduleIndex(), SubjectScheduleDTO::setSubjectScheduleIndex);
+        });
+        List<SubjectScheduleDTO> subjectScheduleDTO = subjectSchedules.stream().filter(item -> item.getCandidateAmount() > 0).map(subjectSchedule -> modelMapper.map(subjectSchedule, SubjectScheduleDTO.class)).collect(Collectors.toList());
         return subjectScheduleDTO;
     }
 
@@ -109,13 +109,10 @@ public class SubjectScheduleController extends BaseAPI {
             mapper.map(src -> "2019", SubjectScheduleDTO::setAcademyYear);
             mapper.map(src -> (src.getShift() + 1), SubjectScheduleDTO::setShift);
         });
-        List<String> types = Stream.of(EnumsConst.ExamType.values())
-                .map(Enum::name)
-                .collect(Collectors.toList());
+        List<String> types = Stream.of(EnumsConst.ExamType.values()).map(Enum::name).collect(Collectors.toList());
         List<SubjectScheduleDTO> subjectScheduleDTOs = new ArrayList<>();
         dateScheduleList.forEach(item -> {
-            item.getSubjectSchedules().forEach(ss ->
-            {
+            item.getSubjectSchedules().forEach(ss -> {
                 if (ss.getRoom().getCapacity() > 0) {
                     SubjectScheduleDTO ssDto = modelMapper.map(ss, SubjectScheduleDTO.class);
                     ssDto.setDateExam(LocalDate.parse(item.getDate()));
@@ -136,33 +133,35 @@ public class SubjectScheduleController extends BaseAPI {
 
     @PostMapping("/schedule-excel")
     @Operation(summary = "Tạo lịch thi bằng excel")
-    public ResponseEntity createScheduleByExcel(@RequestParam("file") MultipartFile file) throws IOException {
+    public ObjectResponseWrapper createScheduleByExcel(@RequestParam("file") MultipartFile file,
+                                               @RequestParam("properties") String properties) throws IOException {
 
         try {
             // code tạo lịch thi bằng excel ở đây
             InputStream inputStream = file.getInputStream();
             // đọc nội dung file excel
             Workbook workbook = new XSSFWorkbook(inputStream);
-
-            // dùng lại code tạo lịch thi
-            GWO gwo = new GWO();
-            gwo.setData(workbook);
-            gwo.initData();
-            gwo.gwo();
-            // lưu lại lịch thi
-            Schedule schedule = gwo.finalSchedule;
-        }catch (Exception e){
-
+            ExcelFile.setWb(workbook);
+            InitData.initData();
+            scheduleFileService.generateNewSchedule(Arrays.stream(properties.split(","))
+                    .map(e->Integer.parseInt(e)).collect(Collectors.toList()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ObjectResponseWrapper.builder()
+                    .status(0)
+                    .message("Vui lòng thử lại.")
+                    .build();
         }
 
 
-        return ResponseEntity.ok("Tạo lịch thi thành công.");
+        return ObjectResponseWrapper.builder()
+                .status(1)
+                .message("Đã tạo một lịch thi mới")
+                .build();
     }
 
     @GetMapping("/student")
-    public ResponseEntity getSubjectScheduleByStudent(@RequestParam("year") int year,
-                                                      @RequestParam("semester") int semester,
-                                                      @RequestHeader("Access-Token") String accessToken) {
+    public ResponseEntity getSubjectScheduleByStudent(@RequestParam("year") int year, @RequestParam("semester") int semester, @RequestHeader("Access-Token") String accessToken) {
 
         // lấy theo token
         String token = "";
@@ -184,9 +183,7 @@ public class SubjectScheduleController extends BaseAPI {
     }
 
     @GetMapping("/export-schedule")
-    public ResponseEntity exportExcelScheduleStudent(@RequestParam("year") int year,
-                                                     @RequestParam("semester") int semester,
-                                                     @RequestHeader("Access-Token") String accessToken) {
+    public ResponseEntity exportExcelScheduleStudent(@RequestParam("year") int year, @RequestParam("semester") int semester, @RequestHeader("Access-Token") String accessToken) {
         try {
             // lấy theo token
             String token = "";
@@ -202,10 +199,7 @@ public class SubjectScheduleController extends BaseAPI {
             String fileName = "lich-thi" + ".xlsx";
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             workbook.write(outputStream);
-            return ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_OCTET_STREAM)
-                    .header("content-disposition", "attachment;filename=" + fileName)
-                    .body(outputStream.toByteArray());
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).header("content-disposition", "attachment;filename=" + fileName).body(outputStream.toByteArray());
         } catch (Exception e) {
             e.printStackTrace();
         }
