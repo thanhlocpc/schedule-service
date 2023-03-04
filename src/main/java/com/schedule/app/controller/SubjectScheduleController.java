@@ -17,13 +17,10 @@ import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
 import com.schedule.initialization.data.InitData;
 import com.schedule.initialization.gwo.GWO;
+import com.schedule.initialization.models.*;
 import com.schedule.initialization.utils.ExcelFile;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.experimental.ExtensionMethod;
-import com.schedule.initialization.models.ChangeScheduleRequest;
-import com.schedule.initialization.models.DateSchedule;
-import com.schedule.initialization.models.Schedule;
-import com.schedule.initialization.models.SubjectSchedule;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.apache.poi.xwpf.usermodel.IBody;
@@ -60,6 +57,12 @@ public class SubjectScheduleController extends BaseAPI {
     @PostMapping("/change")
     public ResponseEntity changeSchedule(@RequestBody List<ChangeScheduleRequest> changeSchedules) throws IOException, ClassNotFoundException, CloneNotSupportedException {
         Schedule scheduleChange = scheduleFileService.changeSchedule(changeSchedules);
+        if (scheduleChange == null) return ResponseEntity.badRequest().body(null);
+        else return ResponseEntity.ok(scheduleChange);
+    }
+    @PostMapping("/changeSubjectSchedule")
+    public ResponseEntity changeSubjectSchedule(@RequestBody List<ChangeSubjectScheduleRequest> changeSubjectSchedules) throws IOException, ClassNotFoundException, CloneNotSupportedException {
+        Schedule scheduleChange = scheduleFileService.changeSubjectSchedule(changeSubjectSchedules);
         if (scheduleChange == null) return ResponseEntity.badRequest().body(null);
         else return ResponseEntity.ok(scheduleChange);
     }
@@ -105,8 +108,8 @@ public class SubjectScheduleController extends BaseAPI {
             mapper.map(src -> src.getRoom().getRoom().getName(), SubjectScheduleDTO::setClassroomName);
             mapper.map(src -> src.getRoom().getRegistrationClass().getName(), SubjectScheduleDTO::setCourseName);
             mapper.map(src -> "1", SubjectScheduleDTO::setSemesterName);
-            mapper.map(src -> src.getRoom().getRegistrationClass().getGrade().getName(), SubjectScheduleDTO::setClassName);
             mapper.map(src -> "2019", SubjectScheduleDTO::setAcademyYear);
+            mapper.map(src -> src.getRoom().getRegistrationClass().getGrade().getName(), SubjectScheduleDTO::setClassName);
             mapper.map(src -> (src.getShift() + 1), SubjectScheduleDTO::setShift);
         });
         List<String> types = Stream.of(EnumsConst.ExamType.values()).map(Enum::name).collect(Collectors.toList());

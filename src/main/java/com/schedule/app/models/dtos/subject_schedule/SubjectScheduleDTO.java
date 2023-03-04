@@ -12,6 +12,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubjectScheduleDTO {
+    private int id;
 
     private String subjectId;
 

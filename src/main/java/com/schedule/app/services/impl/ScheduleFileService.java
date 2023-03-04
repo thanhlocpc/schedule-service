@@ -9,10 +9,7 @@ import com.schedule.app.repository.IScheduleFileRepository;
 import com.schedule.app.services.IScheduleFileService;
 import com.schedule.initialization.data.InitData;
 import com.schedule.initialization.gwo.GWO;
-import com.schedule.initialization.models.ChangeScheduleRequest;
-import com.schedule.initialization.models.DateSchedule;
-import com.schedule.initialization.models.Schedule;
-import com.schedule.initialization.models.SubjectSchedule;
+import com.schedule.initialization.models.*;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
@@ -94,7 +91,29 @@ public class ScheduleFileService implements IScheduleFileService {
 
         return scheduleAfterChange;
     }
+    @Override
+    @Transactional(rollbackFor = {Exception.class})
+    public Schedule changeSubjectSchedule(List<ChangeSubjectScheduleRequest> changeSubjectScheduleRequests) throws IOException, ClassNotFoundException, CloneNotSupportedException {
+        ScheduleFile scheduleFile = getUsedScheduleFile();
 
+        ByteArrayInputStream bis = new ByteArrayInputStream(scheduleFile.getFile());
+        ObjectInputStream ois = new ObjectInputStream(bis);
+        Schedule schedule = (Schedule) ois.readObject();
+        ois.close();
+        GWO gwo = new GWO();
+        byte[] scheduleAfterChangeByteArray = gwo.changeSubjectSchedule(changeSubjectScheduleRequests, schedule);
+        Schedule scheduleAfterChange = null;
+        if (scheduleAfterChangeByteArray != null) {
+            ByteArrayInputStream bisAC = new ByteArrayInputStream(scheduleAfterChangeByteArray);
+            ObjectInputStream oisAC = new ObjectInputStream(bisAC);
+            scheduleAfterChange = (Schedule) oisAC.readObject();
+            ois.close();
+            scheduleFileRepository.save(scheduleFile);
+            addScheduleFile(new ScheduleFile(LocalDateTime.now().toString(), scheduleAfterChangeByteArray, FileStatus.CHANGE, scheduleFile.getSemester()));
+        }
+
+        return scheduleAfterChange;
+    }
     @Override
     public Workbook exportSchedule(Long uid, int semester, int year, Schedule schedule) {
 
