@@ -10,8 +10,12 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface ISubjectScheduleRepository extends JpaRepository<SubjectSchedule,Long> {
-    @Query("Select ss from SubjectSchedule ss where ss.course.semester.academyYear=:year")
+    @Query("Select ss from SubjectSchedule ss where ss.course.semester.academyYear =:year")
     List<SubjectSchedule> getSubjectSchedulesByAcademyYear(@Param("year") int year);
+
+    @Query("Select ss from SubjectSchedule ss where ss.course.semester.academyYear =:year and " +
+            " ss.course.semester.semesterName =:semester")
+    List<SubjectSchedule> getSubjectScheduleBySemester(@Param("year") int year, @Param("semester") int semester);
 
     @Query("select ss from SubjectSchedule ss where ss.course.id in :courseIds")
     List<SubjectSchedule> getAllSubjectScheduleByCourse_Id(@Param("courseIds") List<Long> courseIds);

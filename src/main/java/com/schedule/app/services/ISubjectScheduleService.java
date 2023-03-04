@@ -8,9 +8,14 @@ import java.util.List;
 
 public interface ISubjectScheduleService {
     List<SubjectSchedule> getSubjectSchedulesByAcademyYear( int year);
+
+    List<SubjectSchedule> getSubjectScheduleBySemester( int year, int semester);
+
     List<SubjectSchedule> getSubjectSchedules();
 
     void setDefaultSubjectSchedule(String fileName) throws IOException, ClassNotFoundException;
 
     Workbook exportSchedule(Long uid, int semester, int year);
+    Workbook exportScheduleBySemester(int semester, int year);
+
 }

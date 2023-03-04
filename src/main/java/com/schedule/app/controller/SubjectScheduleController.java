@@ -7,32 +7,26 @@ import com.schedule.app.handler.ScheduleServiceException;
 import com.schedule.app.models.dtos.subject_schedule.SubjectScheduleDTO;
 import com.schedule.app.models.enums.EnumsConst;
 import com.schedule.app.models.wrapper.ObjectResponseWrapper;
-import com.schedule.app.repository.IScheduleFileRepository;
 import com.schedule.app.repository.ISubjectScheduleRepository;
-import com.schedule.app.requests.GenerateScheduleRequest;
 import com.schedule.app.security.UserPrincipal;
 import com.schedule.app.services.IScheduleFileService;
 import com.schedule.app.services.ISubjectScheduleService;
 import com.schedule.app.utils.Constants;
 import com.schedule.app.utils.Extensions;
 import com.schedule.initialization.data.InitData;
-import com.schedule.initialization.gwo.GWO;
 import com.schedule.initialization.models.*;
 import com.schedule.initialization.utils.ExcelFile;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.experimental.ExtensionMethod;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.poi.xwpf.usermodel.IBody;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Description;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import javax.websocket.server.PathParam;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -185,7 +179,36 @@ public class SubjectScheduleController extends BaseAPI {
         return ResponseEntity.ok(Collections.EMPTY_LIST);
     }
 
+    @GetMapping("/schedule")
+    public ResponseEntity getSubjectScheduleBySemester(@RequestParam("year") int year,
+                                                       @RequestParam("semester") int semester) {
+
+        // lấy ds lịch thi
+        List<com.schedule.app.entities.SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectScheduleBySemester(year, semester);
+        if(subjectSchedules != null && !subjectSchedules.isEmpty()){
+            List<SubjectScheduleDTO> res = subjectSchedules.stream().map(e->SubjectScheduleConverter.toSubjectScheduleDTO(e))
+                    .collect(Collectors.toList());
+            return ResponseEntity.ok(res);
+        }
+        return ResponseEntity.ok(Collections.EMPTY_LIST);
+    }
     @GetMapping("/export-schedule")
+    public ResponseEntity exportExcelScheduleBySemester(@RequestParam("year") int year,
+                                                        @RequestParam("semester") int semester) {
+        try {
+
+            Workbook workbook = subjectScheduleService.exportScheduleBySemester(semester, year);
+            String fileName = "lich-thi" + ".xlsx";
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            workbook.write(outputStream);
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_OCTET_STREAM).header("content-disposition", "attachment;filename=" + fileName).body(outputStream.toByteArray());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return ResponseEntity.ok(Collections.EMPTY_LIST);
+    }
+    @GetMapping("/export-schedule/student")
     public ResponseEntity exportExcelScheduleStudent(@RequestParam("year") int year, @RequestParam("semester") int semester, @RequestHeader("Access-Token") String accessToken) {
         try {
             // lấy theo token

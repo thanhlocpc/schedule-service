@@ -18,6 +18,7 @@ import org.apache.poi.xssf.usermodel.XSSFCellStyle;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -49,6 +50,11 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
     @Override
     public List<SubjectSchedule> getSubjectSchedulesByAcademyYear(int year) {
         return subjectScheduleRepository.getSubjectSchedulesByAcademyYear(year);
+    }
+
+    @Override
+    public List<SubjectSchedule> getSubjectScheduleBySemester(int year, int semester) {
+        return subjectScheduleRepository.getSubjectScheduleBySemester(year, semester);
     }
 
     @Override
@@ -100,6 +106,24 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
                 getSubjectScheduleByUserIdAndYearAndSemester(uid, year, semester);
         if (subjectScheduleResults != null && !subjectScheduleResults.isEmpty()) {
             subjectScheduleDTO = subjectScheduleResults.stream().map(subjectSchedule -> SubjectScheduleConverter.toSubjectScheduleDTO(subjectSchedule.getSubjectSchedule())).collect(Collectors.toList());
+        }
+        // create excel file
+        XSSFWorkbook workbook = new XSSFWorkbook();
+        Sheet sheet = workbook.createSheet("lich-thi");
+        buildHeader(workbook, sheet);
+        buildData(workbook, sheet, subjectScheduleDTO);
+        return workbook;
+    }
+
+    @Override
+    public Workbook exportScheduleBySemester(int semester, int year) {
+        // lấy ds lịch thi
+        List<SubjectScheduleDTO> subjectScheduleDTO = new ArrayList<>();
+        List<SubjectSchedule> subjectSchedules = getSubjectScheduleBySemester(year, semester);
+
+        if (subjectSchedules != null && !subjectSchedules.isEmpty()) {
+            subjectScheduleDTO = subjectSchedules.stream().map(e->SubjectScheduleConverter.toSubjectScheduleDTO(e))
+                    .collect(Collectors.toList());
         }
         // create excel file
         XSSFWorkbook workbook = new XSSFWorkbook();
