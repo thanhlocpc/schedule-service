@@ -18,4 +18,5 @@ public interface ISubjectScheduleService {
     Workbook exportSchedule(Long uid, int semester, int year);
     Workbook exportScheduleBySemester(int semester, int year);
 
+    void removeFileSchedule(String fileName);
 }

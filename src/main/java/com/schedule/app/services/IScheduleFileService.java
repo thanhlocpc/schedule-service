@@ -17,8 +17,8 @@ public interface IScheduleFileService {
     ScheduleFile getUsedScheduleFile();
     ScheduleFile getScheduleFileByFileName(String fileName);
     List<ScheduleFileDTO> getAllScheduleFile();
-    Schedule changeSchedule(List<ChangeScheduleRequest> changeScheduleRequests) throws IOException, ClassNotFoundException, CloneNotSupportedException;
-    Schedule changeSubjectSchedule(List<ChangeSubjectScheduleRequest> changeScheduleRequests)throws IOException, ClassNotFoundException, CloneNotSupportedException;
+    Schedule changeSchedule(List<ChangeScheduleRequest> changeScheduleRequests,String fileName) throws IOException, ClassNotFoundException, CloneNotSupportedException;
+    Schedule changeSubjectSchedule(List<ChangeSubjectScheduleRequest> changeScheduleRequests,String fileName)throws IOException, ClassNotFoundException, CloneNotSupportedException;
     Workbook exportSchedule(Long uid, int semester, int year, Schedule schedule);
 
     void setFileUsedToStatus(FileStatus fileStatus);

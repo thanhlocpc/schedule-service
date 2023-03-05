@@ -48,15 +48,15 @@ public class SubjectScheduleController extends BaseAPI {
     @Autowired
     private ISubjectScheduleRepository iSubjectScheduleRepository;
 
-    @PostMapping("/change")
-    public ResponseEntity changeSchedule(@RequestBody List<ChangeScheduleRequest> changeSchedules) throws IOException, ClassNotFoundException, CloneNotSupportedException {
-        Schedule scheduleChange = scheduleFileService.changeSchedule(changeSchedules);
+    @PostMapping("/change/{fileName}")
+    public ResponseEntity changeSchedule(@RequestBody List<ChangeScheduleRequest> changeSchedules,@PathVariable("fileName")String fileName) throws IOException, ClassNotFoundException, CloneNotSupportedException {
+        Schedule scheduleChange = scheduleFileService.changeSchedule(changeSchedules,fileName);
         if (scheduleChange == null) return ResponseEntity.badRequest().body(null);
         else return ResponseEntity.ok(scheduleChange);
     }
-    @PostMapping("/changeSubjectSchedule")
-    public ResponseEntity changeSubjectSchedule(@RequestBody List<ChangeSubjectScheduleRequest> changeSubjectSchedules) throws IOException, ClassNotFoundException, CloneNotSupportedException {
-        Schedule scheduleChange = scheduleFileService.changeSubjectSchedule(changeSubjectSchedules);
+    @PostMapping("/changeSubjectSchedule/{fileName}")
+    public ResponseEntity changeSubjectSchedule(@RequestBody List<ChangeSubjectScheduleRequest> changeSubjectSchedules,@PathVariable("fileName")String fileName) throws IOException, ClassNotFoundException, CloneNotSupportedException {
+        Schedule scheduleChange = scheduleFileService.changeSubjectSchedule(changeSubjectSchedules,fileName);
         if (scheduleChange == null) return ResponseEntity.badRequest().body(null);
         else return ResponseEntity.ok(scheduleChange);
     }
@@ -64,6 +64,11 @@ public class SubjectScheduleController extends BaseAPI {
     @PostMapping("/as-default/{fileName}")
     public ResponseEntity setDefaultSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
         subjectScheduleService.setDefaultSubjectSchedule(fileName);
+        return ResponseEntity.ok().build();
+    }
+    @DeleteMapping("/remove/{fileName}")
+    public ResponseEntity removeFileSchedule(@PathVariable("fileName") String fileName)  {
+        subjectScheduleService.removeFileSchedule(fileName);
         return ResponseEntity.ok().build();
     }
 
@@ -100,11 +105,13 @@ public class SubjectScheduleController extends BaseAPI {
         modelMapper.typeMap(SubjectSchedule.class, SubjectScheduleDTO.class).addMappings(mapper -> {
             mapper.map(src -> src.getSubject().getName(), SubjectScheduleDTO::setSubjectName);
             mapper.map(src -> src.getRoom().getRoom().getName(), SubjectScheduleDTO::setClassroomName);
-            mapper.map(src -> src.getRoom().getRegistrationClass().getName(), SubjectScheduleDTO::setCourseName);
-            mapper.map(src -> "1", SubjectScheduleDTO::setSemesterName);
-            mapper.map(src -> "2019", SubjectScheduleDTO::setAcademyYear);
+            mapper.map(src -> src.getRoom().getRegistrationClass().getId(), SubjectScheduleDTO::setCourseName);
+            mapper.map(src -> schedule.getSemester(), SubjectScheduleDTO::setSemesterName);
+            mapper.map(src -> schedule.getAcademyYear(), SubjectScheduleDTO::setAcademyYear);
             mapper.map(src -> src.getRoom().getRegistrationClass().getGrade().getName(), SubjectScheduleDTO::setClassName);
             mapper.map(src -> (src.getShift() + 1), SubjectScheduleDTO::setShift);
+            mapper.map(src -> src.getRoom().getCapacity(), SubjectScheduleDTO::setCandidateAmount);
+            mapper.map(src -> src.getRoom().getIndex(), SubjectScheduleDTO::setSubjectScheduleIndex);
         });
         List<String> types = Stream.of(EnumsConst.ExamType.values()).map(Enum::name).collect(Collectors.toList());
         List<SubjectScheduleDTO> subjectScheduleDTOs = new ArrayList<>();

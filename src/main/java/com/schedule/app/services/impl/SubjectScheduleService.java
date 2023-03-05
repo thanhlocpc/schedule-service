@@ -114,7 +114,11 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
         buildData(workbook, sheet, subjectScheduleDTO);
         return workbook;
     }
-
+    @Override
+    public void removeFileSchedule(String fileName){
+        ScheduleFile sf=scheduleFileRepository.getScheduleFileByName(fileName);
+        scheduleFileRepository.delete(sf);
+    }
     @Override
     public Workbook exportScheduleBySemester(int semester, int year) {
         // lấy ds lịch thi

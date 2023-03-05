@@ -42,7 +42,7 @@ public class ScheduleFileService implements IScheduleFileService {
         List<String> dates = InitData.examDates;
         GWO gwo = new GWO(dates,properties);
         byte[] scheduleByteArray = gwo.generateNewSchedule(1);
-        Semester semester = new Semester(1, 2021);
+        Semester semester = new Semester(InitData.semester, InitData.academyYear);
         semester.setId(1L);
         addScheduleFile(new ScheduleFile(LocalDateTime.now().toString(), scheduleByteArray, FileStatus.NEW, semester));
 
@@ -70,8 +70,8 @@ public class ScheduleFileService implements IScheduleFileService {
 
     @Override
     @Transactional(rollbackFor = {Exception.class})
-    public Schedule changeSchedule(List<ChangeScheduleRequest> changeScheduleRequests) throws IOException, ClassNotFoundException, CloneNotSupportedException {
-        ScheduleFile scheduleFile = getUsedScheduleFile();
+    public Schedule changeSchedule(List<ChangeScheduleRequest> changeScheduleRequests,String fileName) throws IOException, ClassNotFoundException, CloneNotSupportedException {
+        ScheduleFile scheduleFile =fileName.equals("USED")?getUsedScheduleFile():getScheduleFileByFileName(fileName);
 
         ByteArrayInputStream bis = new ByteArrayInputStream(scheduleFile.getFile());
         ObjectInputStream ois = new ObjectInputStream(bis);
@@ -93,8 +93,8 @@ public class ScheduleFileService implements IScheduleFileService {
     }
     @Override
     @Transactional(rollbackFor = {Exception.class})
-    public Schedule changeSubjectSchedule(List<ChangeSubjectScheduleRequest> changeSubjectScheduleRequests) throws IOException, ClassNotFoundException, CloneNotSupportedException {
-        ScheduleFile scheduleFile = getUsedScheduleFile();
+    public Schedule changeSubjectSchedule(List<ChangeSubjectScheduleRequest> changeSubjectScheduleRequests,String fileName) throws IOException, ClassNotFoundException, CloneNotSupportedException {
+        ScheduleFile scheduleFile =fileName.equals("USED")?getUsedScheduleFile():getScheduleFileByFileName(fileName);
 
         ByteArrayInputStream bis = new ByteArrayInputStream(scheduleFile.getFile());
         ObjectInputStream ois = new ObjectInputStream(bis);
