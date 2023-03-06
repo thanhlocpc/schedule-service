@@ -81,7 +81,8 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
 
         List<SubjectSchedule> subjectSchedules = new ArrayList<>();
         for (DateSchedule ds : schedule.getDateScheduleList()) {
-            subjectSchedules.addAll(ds.getSubjectSchedules().stream().filter(item -> item.getRoom().getCapacity() > 0).map(ss -> {
+            List<com.schedule.initialization.models.SubjectSchedule> sss=ds.getSubjectSchedules().stream().filter(item -> item.getRoom().getCapacity() > 0).collect(Collectors.toList());
+            List<SubjectSchedule>sss2= sss.stream().map(ss -> {
                 Subject subject = new Subject();
                 subject.setId(ss.getSubject().getId());
                 Classroom classroom = new Classroom();
@@ -89,7 +90,8 @@ public class SubjectScheduleService extends ABaseServices implements ISubjectSch
                 Course course = new Course();
                 course.setId((long) ss.getRoom().getRegistrationClass().getDbId());
                 return new SubjectSchedule(subject, classroom, course, ss.getShift(), LocalDate.parse(ds.getDate()), ss.getRoom().getIndex(), ss.getRoom().getCapacity());
-            }).collect(Collectors.toList()));
+            }).collect(Collectors.toList());
+            subjectSchedules.addAll(sss2);
         }
         subjectScheduleRepository.saveAll(subjectSchedules);
         if (scheduleFileService.getUsedScheduleFile() != null)

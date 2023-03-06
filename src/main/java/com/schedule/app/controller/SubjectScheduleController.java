@@ -64,7 +64,7 @@ public class SubjectScheduleController extends BaseAPI {
     @PostMapping("/as-default/{fileName}")
     public ResponseEntity setDefaultSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
         subjectScheduleService.setDefaultSubjectSchedule(fileName);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(Collections.EMPTY_LIST);
     }
     @DeleteMapping("/remove/{fileName}")
     public ResponseEntity removeFileSchedule(@PathVariable("fileName") String fileName)  {
