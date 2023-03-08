@@ -1,5 +1,6 @@
 package com.schedule.app.controller;
 
+import com.schedule.app.annotations.swagger.RequiredHeaderToken;
 import com.schedule.app.entities.ScheduleFile;
 import com.schedule.app.models.dtos.subject.SubjectDTO;
 import com.schedule.app.models.wrapper.ObjectResponseWrapper;
@@ -32,18 +33,23 @@ public class SubjectController {
     private ISubjectService subjectService;
     @Autowired
     private IScheduleFileService scheduleFileService;
+    @RequiredHeaderToken
     @GetMapping("/schedule/{fileName}")
     public List<SubjectDTO> getSubjectWithFileName(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
         return subjectService.getSubjectWithDateByFileName(fileName);
     }
+
+    @RequiredHeaderToken
     @GetMapping("/schedule")
     public List<SubjectDTO> getSubjectWithDate(){
         return subjectService.getSubjectWithDate();
     }
+    @RequiredHeaderToken
     @GetMapping("/schedule-files")
     public ResponseEntity getAllSchdeduleFile(){
         return ResponseEntity.ok().body(scheduleFileService.getAllScheduleFile());
     }
+    @RequiredHeaderToken
     @PostMapping("/newSchedule")
     public ObjectResponseWrapper generateNewSchedule(@RequestBody GenerateScheduleRequest generateScheduleRequest) throws IOException, InterruptedException, CloneNotSupportedException, ClassNotFoundException {
        try {
@@ -62,6 +68,8 @@ public class SubjectController {
                 .message("Đã tạo một lịch thi mới")
                 .build();
     }
+
+    @RequiredHeaderToken
     @GetMapping("/export-schedule/{fileName}")
     public ResponseEntity exportSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
 

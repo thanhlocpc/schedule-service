@@ -1,5 +1,6 @@
 package com.schedule.app.controller;
 
+import com.schedule.app.annotations.swagger.RequiredHeaderToken;
 import com.schedule.app.converter.SubjectScheduleConverter;
 import com.schedule.app.entities.ScheduleFile;
 import com.schedule.app.entities.SubjectScheduleResult;
@@ -48,12 +49,15 @@ public class SubjectScheduleController extends BaseAPI {
     @Autowired
     private ISubjectScheduleRepository iSubjectScheduleRepository;
 
+    @RequiredHeaderToken
     @PostMapping("/change/{fileName}")
     public ResponseEntity changeSchedule(@RequestBody List<ChangeScheduleRequest> changeSchedules,@PathVariable("fileName")String fileName) throws IOException, ClassNotFoundException, CloneNotSupportedException {
         Schedule scheduleChange = scheduleFileService.changeSchedule(changeSchedules,fileName);
         if (scheduleChange == null) return ResponseEntity.badRequest().body(null);
         else return ResponseEntity.ok(scheduleChange);
     }
+
+    @RequiredHeaderToken
     @PostMapping("/changeSubjectSchedule/{fileName}")
     public ResponseEntity changeSubjectSchedule(@RequestBody List<ChangeSubjectScheduleRequest> changeSubjectSchedules,@PathVariable("fileName")String fileName) throws IOException, ClassNotFoundException, CloneNotSupportedException {
         Schedule scheduleChange = scheduleFileService.changeSubjectSchedule(changeSubjectSchedules,fileName);
@@ -61,17 +65,20 @@ public class SubjectScheduleController extends BaseAPI {
         else return ResponseEntity.ok(scheduleChange);
     }
 
+    @RequiredHeaderToken
     @PostMapping("/as-default/{fileName}")
     public ResponseEntity setDefaultSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
         subjectScheduleService.setDefaultSubjectSchedule(fileName);
         return ResponseEntity.ok(Collections.EMPTY_LIST);
     }
+    @RequiredHeaderToken
     @DeleteMapping("/remove/{fileName}")
     public ResponseEntity removeFileSchedule(@PathVariable("fileName") String fileName)  {
         subjectScheduleService.removeFileSchedule(fileName);
         return ResponseEntity.ok().build();
     }
 
+    @RequiredHeaderToken
     @GetMapping("/using/{academyYear}")
     public List<SubjectScheduleDTO> getSubjectSchedulesByAcademyYear(@PathVariable(name = "academyYear") Integer year) {
         List<com.schedule.app.entities.SubjectSchedule> subjectSchedules = subjectScheduleService.getSubjectSchedulesByAcademyYear(year);
@@ -91,6 +98,7 @@ public class SubjectScheduleController extends BaseAPI {
         return subjectScheduleDTO;
     }
 
+    @RequiredHeaderToken
     @GetMapping("/{fileName}")
     public List<SubjectScheduleDTO> getSubjectSchedules(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
         System.out.println("controller " + fileName);
@@ -135,6 +143,7 @@ public class SubjectScheduleController extends BaseAPI {
         return subjectScheduleDTOs;
     }
 
+    @RequiredHeaderToken
     @PostMapping("/schedule-excel")
     @Operation(summary = "Tạo lịch thi bằng excel")
     public ObjectResponseWrapper createScheduleByExcel(@RequestParam("file") MultipartFile file,
@@ -165,7 +174,9 @@ public class SubjectScheduleController extends BaseAPI {
     }
 
     @GetMapping("/student")
-    public ResponseEntity getSubjectScheduleByStudent(@RequestParam("year") int year, @RequestParam("semester") int semester, @RequestHeader("Access-Token") String accessToken) {
+    public ResponseEntity getSubjectScheduleByStudent(@RequestParam("year") int year,
+                                                      @RequestParam("semester") int semester,
+                                                      @RequestHeader("Access-Token") String accessToken) {
 
         // lấy theo token
         String token = "";
@@ -186,6 +197,7 @@ public class SubjectScheduleController extends BaseAPI {
         return ResponseEntity.ok(Collections.EMPTY_LIST);
     }
 
+    @RequiredHeaderToken
     @GetMapping("/schedule")
     public ResponseEntity getSubjectScheduleBySemester(@RequestParam("year") int year,
                                                        @RequestParam("semester") int semester) {
@@ -199,6 +211,8 @@ public class SubjectScheduleController extends BaseAPI {
         }
         return ResponseEntity.ok(Collections.EMPTY_LIST);
     }
+
+    @RequiredHeaderToken
     @GetMapping("/export-schedule")
     public ResponseEntity exportExcelScheduleBySemester(@RequestParam("year") int year,
                                                         @RequestParam("semester") int semester) {
@@ -216,7 +230,9 @@ public class SubjectScheduleController extends BaseAPI {
         return ResponseEntity.ok(Collections.EMPTY_LIST);
     }
     @GetMapping("/export-schedule/student")
-    public ResponseEntity exportExcelScheduleStudent(@RequestParam("year") int year, @RequestParam("semester") int semester, @RequestHeader("Access-Token") String accessToken) {
+    public ResponseEntity exportExcelScheduleStudent(@RequestParam("year") int year,
+                                                     @RequestParam("semester") int semester,
+                                                     @RequestHeader("Access-Token") String accessToken) {
         try {
             // lấy theo token
             String token = "";
