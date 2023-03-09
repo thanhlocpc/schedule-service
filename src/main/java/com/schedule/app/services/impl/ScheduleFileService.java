@@ -6,6 +6,7 @@ import com.schedule.app.models.dtos.schedule_file.ScheduleFileDTO;
 import com.schedule.app.models.enums.EnumsConst;
 import com.schedule.app.models.enums.FileStatus;
 import com.schedule.app.repository.IScheduleFileRepository;
+import com.schedule.app.services.ABaseServices;
 import com.schedule.app.services.IScheduleFileService;
 import com.schedule.initialization.data.InitData;
 import com.schedule.initialization.gwo.GWO;
@@ -28,7 +29,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class ScheduleFileService implements IScheduleFileService {
+public class ScheduleFileService extends ABaseServices implements IScheduleFileService {
     @Autowired
     IScheduleFileRepository scheduleFileRepository;
 
@@ -42,8 +43,9 @@ public class ScheduleFileService implements IScheduleFileService {
         List<String> dates = InitData.examDates;
         GWO gwo = new GWO(dates,properties);
         byte[] scheduleByteArray = gwo.generateNewSchedule(1);
-        Semester semester = new Semester(InitData.semester, InitData.academyYear);
-        semester.setId(1L);
+        Semester semester = semesterRepository.
+                findSemesterByAcademyYearAndSemesterName(InitData.academyYear, InitData.semester);
+//        semester.setId(1L);
         addScheduleFile(new ScheduleFile(LocalDateTime.now().toString(), scheduleByteArray, FileStatus.NEW, semester));
 
         Schedule schedule = gwo.convertByteToSchedule(scheduleByteArray);

@@ -53,6 +53,9 @@ public abstract class ABaseServices {
     protected
     IScoreTableRepository scoreRepository;
 
+    @Autowired
+    protected
+    ISemesterRepository semesterRepository;
 
 
     // service

@@ -20,6 +20,6 @@ public class ScheduleFile extends BaseEntity{
     private FileStatus fileStatus;
 
     @ManyToOne
-    @JoinColumn(name = "semester_id")
+    @JoinColumn(name = "semester_id", referencedColumnName = "id")
     private Semester semester;
 }
