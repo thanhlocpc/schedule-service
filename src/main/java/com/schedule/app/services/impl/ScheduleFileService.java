@@ -143,8 +143,7 @@ public class ScheduleFileService implements IScheduleFileService {
         style.setWrapText(false);
         style.setVerticalAlignment(VerticalAlignment.CENTER);
 
-        List<String> types = Stream.of(EnumsConst.ExamType.values())
-                .map(Enum::name)
+        List<EnumsConst.ExamType> types = Stream.of(EnumsConst.ExamType.values())
                 .collect(Collectors.toList());
         int rowIndex = 1;
         for (DateSchedule dateSchedule : dateSchedules)
@@ -159,7 +158,8 @@ public class ScheduleFileService implements IScheduleFileService {
                     createCell(row, 4, subjectSchedule.getRoom().getRoom().getName(), style);
             createCell(row, 5, subjectSchedule.getShift()*3+1, style);
             createCell(row, 6, subjectSchedule.getRoom().getCapacity(), style);
-                    createCell(row, 7, types.get(subjectSchedule.getSubject().getExamForms()), style);
+
+                    createCell(row, 7, types.get(subjectSchedule.getSubject().getExamForms()).getDescription(), style);
                     rowIndex++;
                 }
             }

@@ -67,9 +67,9 @@ public class SubjectScheduleController extends BaseAPI {
 
     @RequiredHeaderToken
     @PostMapping("/as-default/{fileName}")
-    public ResponseEntity setDefaultSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
+    public ObjectResponseWrapper setDefaultSchedule(@PathVariable("fileName") String fileName) throws IOException, ClassNotFoundException {
         subjectScheduleService.setDefaultSubjectSchedule(fileName);
-        return ResponseEntity.ok(Collections.EMPTY_LIST);
+        return ObjectResponseWrapper.builder().status(1).message("ok").build();
     }
     @RequiredHeaderToken
     @DeleteMapping("/remove/{fileName}")
